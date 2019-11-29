@@ -13,7 +13,7 @@ import java.awt.*;
 import java.net.URI;
 
 public class HttpServer {
-    final private Server server;
+    final Server server;
 
     public static void main(String[] args) throws Exception{
         HttpServer server = new HttpServer();
