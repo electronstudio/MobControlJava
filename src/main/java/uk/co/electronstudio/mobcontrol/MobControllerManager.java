@@ -1,7 +1,6 @@
 package uk.co.electronstudio.mobcontrol;
 
 
-
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
@@ -34,7 +33,7 @@ public class MobControllerManager {
     }
 
 
-    public void pollState(){
+    public void pollState() {
         MobController c;
         while ((c = connectionQueue.poll()) != null) {
             connected(c);
@@ -45,8 +44,8 @@ public class MobControllerManager {
             disconnected(d);
         }
 
-        for (Controller controller: controllers) {
-            ((MobController)controller).pollState();
+        for (Controller controller : controllers) {
+            ((MobController) controller).pollState();
         }
     }
 
@@ -60,8 +59,8 @@ public class MobControllerManager {
         listeners.add(listener);
     }
 
-    public void addListenerAndRunForConnectedControllers(ControllerListener listener){
-        for(Controller controller : controllers){
+    public void addListenerAndRunForConnectedControllers(ControllerListener listener) {
+        for (Controller controller : controllers) {
             listener.connected(controller);
         }
         addListener(listener);
@@ -121,8 +120,8 @@ public class MobControllerManager {
         return listeners;
     }
 
-    public void close(){
-        running=false;
+    public void close() {
+        running = false;
         try {
             server.server.stop();
         } catch (Exception e) {

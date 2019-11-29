@@ -28,8 +28,6 @@ public class MobTest {
         init();
 
 
-
-
         JTabbedPane tabbedPane = new JTabbedPane();
         JFrame testFrame = new JFrame();
         SDLInfoPanel[] controllerTabs = setup(tabbedPane, testFrame);
@@ -162,10 +160,10 @@ public class MobTest {
                 titleLabel.setText(c.getName());
 
                 axes.removeAll();
-                for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX ; i++) {
+                for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++) {
                     JLabel label = new JLabel();
                     label.setPreferredSize(new Dimension(100, 30));
-                    label.setText(c.getAxisName(i)) ;//SDL.SDL_GameControllerGetStringForAxis(i));
+                    label.setText(c.getAxisName(i));//SDL.SDL_GameControllerGetStringForAxis(i));
 
                     JProgressBar progressBar = new JProgressBar(-100, 100);
                     progressBar.setPreferredSize(new Dimension(200, 30));

@@ -20,7 +20,6 @@ public class MobController implements RumbleController {
             SDL_CONTROLLER_AXIS_MAX = 6;
 
 
-
     public static final int SDL_CONTROLLER_BUTTON_INVALID = -1,
             SDL_CONTROLLER_BUTTON_A = 0,
             SDL_CONTROLLER_BUTTON_B = 1,
@@ -204,7 +203,7 @@ public class MobController implements RumbleController {
 
     @Override
     public String getName() {
-       return name;
+        return name;
     }
 
     @Override
@@ -230,11 +229,11 @@ public class MobController implements RumbleController {
         return false;
     }
 
-    public static String getButtonName(int i){
+    public static String getButtonName(int i) {
         return buttonNames[i];
     }
 
-    public static String getAxisName(int i){
+    public static String getAxisName(int i) {
         return axisNames[i];
     }
 

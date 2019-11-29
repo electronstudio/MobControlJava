@@ -9,8 +9,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import static uk.co.electronstudio.mobcontrol.MobController.*;
 
-public class WebSocket extends WebSocketAdapter
-{
+public class WebSocket extends WebSocketAdapter {
     static MobControllerManager mobControllerManager;
 
     private MobController controller;
@@ -19,47 +18,43 @@ public class WebSocket extends WebSocketAdapter
     final AtomicReferenceArray<Boolean> controllerButtons = new AtomicReferenceArray<>(SDL_CONTROLLER_BUTTON_MAX);
 
     @Override
-    public void onWebSocketConnect(Session sess)
-    {
+    public void onWebSocketConnect(Session sess) {
         super.onWebSocketConnect(sess);
         System.out.println("Socket Connected: " + sess);
-        for(int i = 0; i<controllerAxis.length(); i++){
+        for (int i = 0; i < controllerAxis.length(); i++) {
             controllerAxis.set(i, 0f);
         }
-        for(int i = 0; i<controllerButtons.length(); i++){
+        for (int i = 0; i < controllerButtons.length(); i++) {
             controllerButtons.set(i, false);
         }
         controller = new MobController(mobControllerManager, this);
         mobControllerManager.connectionQueue.add(controller);
     }
-    
+
     @Override
-    public void onWebSocketText(String message)
-    {
+    public void onWebSocketText(String message) {
         super.onWebSocketText(message);
-        System.out.println(controller+" Received TEXT message: " + message);
+        System.out.println(controller + " Received TEXT message: " + message);
         JsonValue fromJson = new JsonReader().parse(message);
 
-        for(int i=0; i<SDL_CONTROLLER_BUTTON_MAX; i++) {
+        for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
             controllerButtons.set(i, fromJson.getBoolean(buttonNames[i], false));
         }
-        for(int i=0; i<SDL_CONTROLLER_AXIS_MAX; i++) {
+        for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++) {
             controllerAxis.set(i, fromJson.getFloat(axisNames[i], 0.0f));
         }
     }
-    
+
     @Override
-    public void onWebSocketClose(int statusCode, String reason)
-    {
-        super.onWebSocketClose(statusCode,reason);
+    public void onWebSocketClose(int statusCode, String reason) {
+        super.onWebSocketClose(statusCode, reason);
         System.out.println("Socket Closed: [" + statusCode + "] " + reason);
         mobControllerManager.disConnectionQueue.add(controller);
         controller = null;
     }
-    
+
     @Override
-    public void onWebSocketError(Throwable cause)
-    {
+    public void onWebSocketError(Throwable cause) {
         super.onWebSocketError(cause);
         cause.printStackTrace(System.err);
     }

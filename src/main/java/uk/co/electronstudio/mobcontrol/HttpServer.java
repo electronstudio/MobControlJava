@@ -17,7 +17,7 @@ import java.net.URI;
 public class HttpServer {
     final Server server;
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         HttpServer server = new HttpServer();
         server.start();
         Desktop.getDesktop().browse(new URI("http://localhost"));
@@ -65,11 +65,9 @@ public class HttpServer {
         }
     }
 
-    public static class Servlet extends WebSocketServlet
-    {
+    public static class Servlet extends WebSocketServlet {
         @Override
-        public void configure(WebSocketServletFactory factory)
-        {
+        public void configure(WebSocketServletFactory factory) {
             factory.register(WebSocket.class);
         }
     }
