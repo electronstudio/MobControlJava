@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-/*
+/**
  * Doesnt need to implement ControllerManager because it's only ever going
  * to be an additional source of controllers, never the global LibGDX ControllerManager.
  * But makes sense to keep parity with ControllerManager features if we can.
@@ -33,6 +33,12 @@ public class MobControllerManager {
     }
 
 
+    /**
+     * Call this every frame.  It's not actually necessary for updating the axis and button state
+     * because they are updated by one of HttpServer's threads, but it does perform addition of
+     * new controllers, removal of old controllers, and firing of event listeners, because you probably want
+     * these things to happen on your main thread and not behind your back.
+     */
     public void pollState() {
         MobController c;
         while ((c = connectionQueue.poll()) != null) {
