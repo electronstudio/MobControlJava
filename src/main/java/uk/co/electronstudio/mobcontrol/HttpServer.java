@@ -12,11 +12,17 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import java.awt.*;
 import java.net.URI;
 
-public class HttpServer
-{
-    public static void main(String[] args)
-    {
+public class HttpServer {
+    final private Server server;
 
+    public static void main(String[] args) throws Exception{
+        HttpServer server = new HttpServer();
+        server.start();
+        Desktop.getDesktop().browse(new URI("http://localhost"));
+        server.waitForFinish();
+    }
+
+    public HttpServer() {
         ServletContextHandler servletHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletHandler.setContextPath("/");
         ServletHolder holderEvents = new ServletHolder("ws-events", Servlet.class);
@@ -31,24 +37,28 @@ public class HttpServer
         handlers.setHandlers(new Handler[]{resourceHandler, servletHandler, new DefaultHandler()});
 
 
-        Server server = new Server();
+        server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(80);
         server.addConnector(connector);
         server.setHandler(handlers);
-        
+    }
 
-        try
-        {
+    public void start() {
+        try {
+
             server.start();
             server.dump(System.err);
 
-            Desktop.getDesktop().browse(new URI("http://localhost"));
-
-            server.join();
+        } catch (Throwable t) {
+            t.printStackTrace(System.err);
         }
-        catch (Throwable t)
-        {
+    }
+
+    public void waitForFinish() {
+        try {
+            server.join();
+        } catch (Throwable t) {
             t.printStackTrace(System.err);
         }
     }
