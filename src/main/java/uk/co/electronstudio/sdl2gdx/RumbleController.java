@@ -1,4 +1,4 @@
-package uk.co.electronstudio.mobcontrol;
+package uk.co.electronstudio.sdl2gdx;
 
 import com.badlogic.gdx.controllers.Controller;
 

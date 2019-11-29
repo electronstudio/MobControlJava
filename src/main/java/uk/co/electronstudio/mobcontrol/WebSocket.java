@@ -5,22 +5,30 @@ import com.badlogic.gdx.utils.JsonValue;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
+import java.util.concurrent.atomic.AtomicReferenceArray;
+
 import static uk.co.electronstudio.mobcontrol.MobController.*;
 
 public class WebSocket extends WebSocketAdapter
 {
-
     static MobControllerManager mobControllerManager;
 
-    volatile ControllerState controllerState = new ControllerState();
-
     private MobController controller;
+
+    final AtomicReferenceArray<Float> controllerAxis = new AtomicReferenceArray<>(SDL_CONTROLLER_AXIS_MAX);
+    final AtomicReferenceArray<Boolean> controllerButtons = new AtomicReferenceArray<>(SDL_CONTROLLER_BUTTON_MAX);
 
     @Override
     public void onWebSocketConnect(Session sess)
     {
         super.onWebSocketConnect(sess);
         System.out.println("Socket Connected: " + sess);
+        for(int i = 0; i<controllerAxis.length(); i++){
+            controllerAxis.set(i, 0f);
+        }
+        for(int i = 0; i<controllerButtons.length(); i++){
+            controllerButtons.set(i, false);
+        }
         controller = new MobController(mobControllerManager, this);
         mobControllerManager.connectionQueue.add(controller);
     }
@@ -31,15 +39,13 @@ public class WebSocket extends WebSocketAdapter
         super.onWebSocketText(message);
         System.out.println(controller+" Received TEXT message: " + message);
         JsonValue fromJson = new JsonReader().parse(message);
-        float [] axisState = new float[SDL_CONTROLLER_AXIS_MAX];
-        boolean [] buttonState = new boolean[SDL_CONTROLLER_BUTTON_MAX];
+
         for(int i=0; i<SDL_CONTROLLER_BUTTON_MAX; i++) {
-            buttonState[i] = fromJson.getBoolean(buttonNames[i], false);
+            controllerButtons.set(i, fromJson.getBoolean(buttonNames[i], false));
         }
         for(int i=0; i<SDL_CONTROLLER_AXIS_MAX; i++) {
-            axisState[i] = fromJson.getFloat(axisNames[i], 0.0f);
+            controllerAxis.set(i, fromJson.getFloat(axisNames[i], 0.0f));
         }
-        controllerState = new ControllerState(axisState, buttonState);
     }
     
     @Override

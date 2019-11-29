@@ -8,6 +8,8 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
+import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 import java.awt.*;
 import java.net.URI;
@@ -62,4 +64,15 @@ public class HttpServer {
             t.printStackTrace(System.err);
         }
     }
+
+    public static class Servlet extends WebSocketServlet
+    {
+        @Override
+        public void configure(WebSocketServletFactory factory)
+        {
+            factory.register(WebSocket.class);
+        }
+    }
+
+
 }

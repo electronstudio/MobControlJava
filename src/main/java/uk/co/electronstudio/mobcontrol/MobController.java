@@ -5,6 +5,7 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import uk.co.electronstudio.sdl2gdx.RumbleController;
 
 
 public class MobController implements RumbleController {
@@ -157,12 +158,12 @@ public class MobController implements RumbleController {
 
     @Override
     public boolean getButton(int buttonCode) {
-        return webSocket.controllerState.getButton(buttonCode);
+        return webSocket.controllerButtons.get(buttonCode);
     }
 
     @Override
     public float getAxis(int axisCode) {
-        return webSocket.controllerState.getAxis(axisCode);
+        return webSocket.controllerAxis.get(axisCode);
     }
 
     @Override
