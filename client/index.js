@@ -57,7 +57,8 @@ const buttonColours = {
 //
 const buttonIds = Object.values(buttonColours);
 const buttonState = {};
-buttonIds.forEach(buttonId => { buttonState[buttonId] = false; })
+buttonIds.forEach(buttonId => { buttonState[buttonId] = false; });
+const pointerIdMapToButtonId = {};
 
 //
 // State transmission.
@@ -76,21 +77,31 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 // Update state on interaction.
 //
 function onCanvasInteraction(ev, activate) {
-    log(JSON.stringify(ev));
+    //log(JSON.stringify(ev));
     const imageX = (ev.clientX / hitboxCanvas.scrollWidth) * hitboxCanvas.width;
     const imageY = (ev.clientY / hitboxCanvas.scrollHeight) * hitboxCanvas.height;
-    log(imageX, imageY)
+    //log(imageX, imageY)
 
     const imagePixel = hitboxContext.getImageData(imageX, imageY, 1, 1).data;
     const imagePixelString = imagePixel.slice(0, 4).join(',');
-    log(imagePixelString)
+    //log(imagePixelString)
 
     const buttonId = buttonColours[imagePixelString];
-    if (buttonId) { buttonState[buttonId] = activate; }
-    log(buttonId);
+    if (buttonId) {
+        buttonState[buttonId] = activate;
+        pointerIdMapToButtonId[ev.pointerId] = buttonId;
+        log("Button down: "+buttonId);
+        sendState();
+    }
 
-    sendState();
+
 }
 
-hitboxCanvas.onpointerdown = (ev) => { onCanvasInteraction(ev, true); }
-hitboxCanvas.onpointerup = (ev) => { onCanvasInteraction(ev, false); }
+hitboxCanvas.onpointerdown = (ev) => { onCanvasInteraction(ev, true); };
+
+hitboxCanvas.onpointerup = (ev) => {
+    log("Button up: "+pointerIdMapToButtonId[ev.pointerId]);
+    buttonState[pointerIdMapToButtonId[ev.pointerId]] = false;
+    delete pointerIdMapToButtonId[ev.pointerId];
+    sendState();
+};
