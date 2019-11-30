@@ -1,7 +1,7 @@
 //
 // Configuration.
 //
-const ADDRESS = '192.168.1.2/mobcontrol/';
+const ADDRESS = `${new URL(window.location.href).hostname}/mobcontrol/`;
 const UPDATES_PER_SECOND = 1; // Set to 60 at some point.
 
 //
