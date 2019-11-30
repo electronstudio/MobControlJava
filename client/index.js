@@ -76,15 +76,20 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 // Update state on interaction.
 //
 function onCanvasInteraction(ev, activate) {
+    log(JSON.stringify(ev));
     const imageX = (ev.clientX / hitboxCanvas.scrollWidth) * hitboxCanvas.width;
     const imageY = (ev.clientY / hitboxCanvas.scrollHeight) * hitboxCanvas.height;
-    //console.log(imageX, imageY)
-    var imagePixel = hitboxContext.getImageData(imageX, imageY, 1, 1).data;
-    var imagePixelString = imagePixel.slice(0, 4).join(',');
-    console.log(imagePixelString)
-    var buttonId = buttonColours[imagePixelString];
+    log(imageX, imageY)
+
+    const imagePixel = hitboxContext.getImageData(imageX, imageY, 1, 1).data;
+    const imagePixelString = imagePixel.slice(0, 4).join(',');
+    log(imagePixelString)
+
+    const buttonId = buttonColours[imagePixelString];
     if (buttonId) { buttonState[buttonId] = activate; }
-    console.log(buttonId);
+    log(buttonId);
+
+    sendState();
 }
 
 hitboxCanvas.onpointerdown = (ev) => { onCanvasInteraction(ev, true); }
