@@ -13,6 +13,10 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 import java.awt.*;
 import java.net.URI;
+import java.util.logging.Level;
+
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.StdErrLog;
 
 public class HttpServer {
     final Server server;
@@ -25,6 +29,10 @@ public class HttpServer {
     }
 
     public HttpServer() {
+        StdErrLog logger = new StdErrLog();
+        logger.setLevel(StdErrLog.LEVEL_INFO);
+        Log.setLog(logger);
+
         ServletContextHandler servletHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletHandler.setContextPath("/");
         ServletHolder holderEvents = new ServletHolder("ws-events", Servlet.class);
@@ -36,7 +44,7 @@ public class HttpServer {
         resourceHandler.setResourceBase("client");
 
         HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[]{resourceHandler, servletHandler, new DefaultHandler()});
+        handlers.setHandlers(new Handler[]{resourceHandler, servletHandler});
 
 
         server = new Server();
@@ -50,7 +58,7 @@ public class HttpServer {
         try {
 
             server.start();
-            server.dump(System.err);
+            //server.dump(System.err);
 
         } catch (Throwable t) {
             t.printStackTrace(System.err);

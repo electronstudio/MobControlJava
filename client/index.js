@@ -1,8 +1,8 @@
 //
 // Configuration.
 //
-const ADDRESS = 'localhost:80/mobcontrol/';
-const UPDATES_PER_SECOND = 60; // Set to 60 at some point.
+const ADDRESS = '192.168.1.2/mobcontrol/';
+const UPDATES_PER_SECOND = 1; // Set to 60 at some point.
 
 //
 // Load the canvas, context.
@@ -53,17 +53,19 @@ buttonIds.forEach(buttonId => { buttonState[buttonId] = false; })
 function onCanvasInteraction(ev, activate) {
     const imageX = (ev.clientX / hitboxCanvas.scrollWidth) * hitboxCanvas.width;
     const imageY = (ev.clientY / hitboxCanvas.scrollHeight) * hitboxCanvas.height;
+    //console.log(imageX, imageY)
     var imagePixel = hitboxContext.getImageData(imageX, imageY, 1, 1).data;
-    var imagePixelString = imagePixel.join(',');
+    var imagePixelString = imagePixel.slice(0, 4).join(',');
+    console.log(imagePixelString)
     var buttonId = buttonColours[imagePixelString];
     if (buttonId) { buttonState[buttonId] = activate; }
     console.log(buttonId);
 }
 
-hitboxCanvas.onmousedown = (ev) => { onCanvasInteraction(ev, true); }
-hitboxCanvas.ontouchend = (ev) => { onCanvasInteraction(ev, false); }
-hitboxCanvas.onmousedown = (ev) => { onCanvasInteraction(ev, true); }
-hitboxCanvas.onmouseup = (ev) => { onCanvasInteraction(ev, false); }
+
+hitboxCanvas.onpointerdown = (ev) => { onCanvasInteraction(ev, true); }
+hitboxCanvas.onpointerup = (ev) => { onCanvasInteraction(ev, false); }
+
 
 //
 // Transmit padState on regular intervals.
