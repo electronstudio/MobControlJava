@@ -60,7 +60,20 @@ const buttonState = {};
 buttonIds.forEach(buttonId => { buttonState[buttonId] = false; })
 
 //
-// Update state when button press and release.
+// State transmission.
+//
+const socket = new WebSocket(`ws://${ADDRESS}`);
+function sendState() {
+    socket.send(JSON.stringify(buttonState, null, 4));
+}
+
+//
+// Send state at regular intervals.
+//
+setInterval(sendState, 1000 / UPDATES_PER_SECOND);
+
+//
+// Update state on interaction.
 //
 function onCanvasInteraction(ev, activate) {
     const imageX = (ev.clientX / hitboxCanvas.scrollWidth) * hitboxCanvas.width;
@@ -74,15 +87,5 @@ function onCanvasInteraction(ev, activate) {
     console.log(buttonId);
 }
 
-
 hitboxCanvas.onpointerdown = (ev) => { onCanvasInteraction(ev, true); }
 hitboxCanvas.onpointerup = (ev) => { onCanvasInteraction(ev, false); }
-
-
-//
-// Transmit padState on regular intervals.
-//
-const socket = new WebSocket(`ws://${ADDRESS}`);
-setInterval(() => {
-    socket.send(JSON.stringify(buttonState, null, 4));
-}, 1000 / UPDATES_PER_SECOND);
