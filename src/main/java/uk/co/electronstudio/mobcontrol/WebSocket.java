@@ -38,10 +38,14 @@ public class WebSocket extends WebSocketAdapter {
         JsonValue fromJson = new JsonReader().parse(message);
 
         for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
-            controllerButtons.set(i, fromJson.getBoolean(buttonNames[i], false));
+            if(fromJson.has(buttonNames[i])) {
+                controllerButtons.set(i, fromJson.getBoolean(buttonNames[i]));
+            }
         }
         for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++) {
-            controllerAxis.set(i, fromJson.getFloat(axisNames[i], 0.0f));
+            if(fromJson.has(axisNames[i])) {
+                controllerAxis.set(i, fromJson.getFloat(axisNames[i]));
+            }
         }
     }
 
