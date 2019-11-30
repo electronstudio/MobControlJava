@@ -5,6 +5,18 @@ const ADDRESS = '192.168.1.2/mobcontrol/';
 const UPDATES_PER_SECOND = 1; // Set to 60 at some point.
 
 //
+// Logging.
+//
+const logElement = document.getElementById('log');
+function log(line) {
+    if (logElement) {
+        logElement.innerHTML = line + '\n' + logElement.innerHTML;
+    }
+}
+
+log(UPDATES_PER_SECOND);
+
+//
 // Load the canvas, context.
 //
 const hitboxCanvas = document.getElementById('hitboxCanvas');
