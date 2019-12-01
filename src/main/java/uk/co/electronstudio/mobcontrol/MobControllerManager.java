@@ -6,6 +6,8 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.utils.Array;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -26,7 +28,7 @@ public class MobControllerManager {
 
     private boolean running = true;
 
-    public MobControllerManager() {
+    public MobControllerManager() throws MalformedURLException, URISyntaxException {
         WebSocket.mobControllerManager = this;
         server = new HttpServer();
         server.start();

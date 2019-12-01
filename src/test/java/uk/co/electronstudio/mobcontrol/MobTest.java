@@ -8,6 +8,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -47,7 +48,13 @@ public class MobTest {
 
     private static void init() {
 
-        controllerManager = new MobControllerManager();
+        try {
+            controllerManager = new MobControllerManager();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void mainLoop(JFrame testFrame, SDLInfoPanel[] controllerTabs) {

@@ -3,20 +3,21 @@ package uk.co.electronstudio.mobcontrol;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.StdErrLog;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 import java.awt.*;
+import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.logging.Level;
-
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.StdErrLog;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class HttpServer {
     final Server server;
@@ -28,7 +29,7 @@ public class HttpServer {
         server.waitForFinish();
     }
 
-    public HttpServer() {
+    public HttpServer() throws MalformedURLException, IllegalStateException, URISyntaxException {
         StdErrLog logger = new StdErrLog();
         logger.setLevel(StdErrLog.LEVEL_INFO);
         Log.setLog(logger);
@@ -38,10 +39,21 @@ public class HttpServer {
         ServletHolder holderEvents = new ServletHolder("ws-events", Servlet.class);
         servletHandler.addServlet(holderEvents, "/mobcontrol/*");
 
+        URL webRootLocation = this.getClass().getResource("/client/index.html");
+        if (webRootLocation == null) {
+            throw new IllegalStateException("Unable to determine webroot URL location");
+        }
+
+        URI webRootUri = URI.create(webRootLocation.toURI().toASCIIString().replaceFirst("/index.html$", "/"));
+
+        System.err.printf("Web Root URI: %s%n", webRootUri);
+
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(true);
         resourceHandler.setWelcomeFiles(new String[]{"index.html"});
-        resourceHandler.setResourceBase("client");
+
+        resourceHandler.setBaseResource(Resource.newResource(webRootUri));
+
 
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[]{resourceHandler, servletHandler});

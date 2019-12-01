@@ -1,6 +1,20 @@
-plugins {
-    id 'java'
+buildscript{
+    repositories {
+        jcenter()
+    }
+    dependencies{
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+    }
 }
+
+
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+apply plugin: 'com.jfrog.bintray'
 
 group 'uk.co.electronstudio.mobcontrol'
 version '1.0-SNAPSHOT'
@@ -16,11 +30,33 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation group: 'org.eclipse.jetty.websocket', name: 'websocket-api', version: '9.4.24.v20191120'
     implementation group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '9.4.24.v20191120'
-    compile "com.badlogicgames.gdx:gdx:1.9.9"
-    compile "com.badlogicgames.gdx:gdx-controllers:1.9.9"
+    implementation "com.badlogicgames.gdx:gdx:1.9.9"
+    implementation "com.badlogicgames.gdx:gdx-controllers:1.9.9"
 }
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+}
+
+jar{
+//    from files(sourceSets.main.output.classesDir)
+//    from files(sourceSets.main.output.resourcesDir)
+//    from {configurations.compile.collect {zipTree(it)}}
+
+    manifest {
+        attributes 'Main-Class': project.ext.mainClassName
+    }
+}
+
+task uberjar(dependsOn: classes, type: Jar) {
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.test.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from {configurations.compile.collect {zipTree(it)}}
+
+    manifest {
+        attributes 'Main-Class': project.ext.mainClassName
+
+    }
 }
