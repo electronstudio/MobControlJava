@@ -71,6 +71,21 @@ const buttonColours = {
     '46,41,58,255': 'BUTTON_DPAD_RIGHT',
 };
 
+const axisColors = {
+    '255,0,0,255': 'AXIS_LEFT',
+    '0,255,242,255': 'AXIS_RIGHT',
+    '255,255,255,255': 'AXIS_TRIGGERLEFT',
+    '0,0,0,255': 'AXIS_TRIGGERRIGHT',
+};
+
+function pixelStringToRgba(pixelString) {
+    return pixelString.split(',').map((x) => parseInt(x, 10));
+}
+
+function rgbaToPixelString(rgba) {
+    return rgba.join(',');
+}
+
 //
 // Initialise state.
 //
@@ -97,7 +112,7 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 //
 function onCanvasInteraction(ev, activate) {
     const imagePixel = hitboxContext.getImageData(ev.clientX, ev.clientY, 1, 1).data;
-    const imagePixelString = imagePixel.slice(0, 4).join(',');
+    const imagePixelString = rgbaToPixelString(imagePixel.slice(0, 4));
 
     const buttonId = buttonColours[imagePixelString];
     if (buttonId) {
