@@ -83,13 +83,24 @@ function redrawCanvases() {
     const hitboxSize = getHitboxSize();
     hitboxContext.drawImage(hitboxImage, 0, 0, hitboxSize.w, hitboxSize.h);
 
-    for (const pixelString of Object.keys(axisColors)) {
+    for (const pixelString of Object.keys(axis1DColors)) {
+        const axisId = axis1DColors[pixelString]
         const rgba = pixelStringToRgba(pixelString);
-        axisBoundingBoxes[pixelString] = getHitboxRgbaBoundingBox(rgba);
+        axisBoundingBoxes[axisId] = getHitboxRgbaBoundingBox(rgba);
 
         overlayContext.strokeStyle = 'yellow';
         overlayContext.lineWidth = 2;
-        overlayContext.strokeRect(...axisBoundingBoxes[pixelString]);
+        overlayContext.strokeRect(...axisBoundingBoxes[axisId]);
+    }
+
+    for (const pixelString of Object.keys(axis2DColors)) {
+        const axisId = axis2DColors[pixelString]
+        const rgba = pixelStringToRgba(pixelString);
+        axisBoundingBoxes[axisId] = getHitboxRgbaBoundingBox(rgba);
+
+        overlayContext.strokeStyle = 'yellow';
+        overlayContext.lineWidth = 2;
+        overlayContext.strokeRect(...axisBoundingBoxes[axisId]);
     }
 }
 
@@ -132,11 +143,14 @@ const buttonColours = {
     '46,41,58,255': 'BUTTON_DPAD_RIGHT',
 };
 
-const axisColors = {
-    '255,0,0,255': 'AXIS_LEFT',
-    '0,255,242,255': 'AXIS_RIGHT',
+const axis1DColors = {
     '255,255,255,255': 'AXIS_TRIGGERLEFT',
     '0,0,0,255': 'AXIS_TRIGGERRIGHT',
+};
+
+const axis2DColors = {
+    '255,0,0,255': 'AXIS_LEFT',
+    '0,255,242,255': 'AXIS_RIGHT',
 };
 
 function pixelStringToRgba(pixelString) {
@@ -151,16 +165,23 @@ function rgbaToPixelString(rgba) {
 // Initialise state.
 //
 const buttonIds = Object.values(buttonColours);
+const axis1DIds = Object.values(axis1DColors);
+const axis2DIds = Object.values(axis2DColors);
 const buttonState = {};
+const axis1DState = {};
+const axis2DState = {};
 buttonIds.forEach(buttonId => { buttonState[buttonId] = false; });
-const pointerIdMapToButtonId = {};
+axis1DIds.forEach(axisId => { axis1DState[axisId] = 0; });
+axis2DIds.forEach(axisId => { axis1DState[`${axisId}X`] = 0; axis1DState[`${axisId}Y`] = 0; });
+const pointerIdMapToId = {};
 
 //
 // State transmission.
 //
 const socket = new WebSocket(`ws://${ADDRESS}`);
 function sendState() {
-    socket.send(JSON.stringify(buttonState, null, 4));
+    const state = { ...buttonState, ...axis1DState, ...axis2DState };
+    socket.send(JSON.stringify(state, null, 4));
 }
 
 //
@@ -171,24 +192,87 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 //
 // Update state on interaction.
 //
-function onCanvasInteraction(ev, activate) {
+function onPointerDown(ev) {
     const imagePixel = hitboxContext.getImageData(ev.clientX, ev.clientY, 1, 1).data;
     const imagePixelString = rgbaToPixelString(imagePixel.slice(0, 4));
 
     const buttonId = buttonColours[imagePixelString];
     if (buttonId) {
-        buttonState[buttonId] = activate;
-        pointerIdMapToButtonId[ev.pointerId] = buttonId;
+        buttonState[buttonId] = true;
+        pointerIdMapToId[ev.pointerId] = buttonId;
         log("Button down:", buttonId);
+        sendState();
+    }
+
+    const axis1DId = axis1DColors[imagePixelString];
+    if (axis1DId) {
+        pointerIdMapToId[ev.pointerId] = axis1DId;
+    }
+
+    const axis2DId = axis2DColors[imagePixelString];
+    if (axis2DId) {
+        pointerIdMapToId[ev.pointerId] = axis2DId;
+    }
+}
+
+hitboxCanvas.onpointerdown = (ev) => { onPointerDown(ev); };
+
+function onPointerMove(ev) {
+    const imagePixel = hitboxContext.getImageData(ev.clientX, ev.clientY, 1, 1).data;
+    const imagePixelString = rgbaToPixelString(imagePixel.slice(0, 4));
+
+    const axis1DId = axis1DColors[imagePixelString];
+    const axis2DId = axis2DColors[imagePixelString];
+    const axisId = axis1DId || axis2DId;
+
+    if (axisId) {
+        const pointedAxisId = pointerIdMapToId[ev.pointerId];
+        if (axisId === pointedAxisId) {
+            const bb = axisBoundingBoxes[axisId];
+            if (bb) {
+                const [x,y,w,h] = bb;
+                const centerX = x + (w/2);
+                const centerY = y + (h/2);
+                const relX = (ev.clientX - centerX) / (w/2);
+                const relY = (ev.clientY - centerY) / (h/2);
+
+                if (axis1DId) {
+                    axis1DState[axis1DId] = relY;
+                }
+
+                if (axis2DId) {
+                    axis2DState[`${axis2DId}X`] = relX;
+                    axis2DState[`${axis2DId}Y`] = relY;
+                }
+            }
+        }
+    }
+
+    if (axisId) {
         sendState();
     }
 }
 
-hitboxCanvas.onpointerdown = (ev) => { onCanvasInteraction(ev, true); };
+hitboxCanvas.onpointermove = (ev) => { onPointerMove(ev); };
 
 hitboxCanvas.onpointerup = (ev) => {
-    log("Button up:", pointerIdMapToButtonId[ev.pointerId]);
-    buttonState[pointerIdMapToButtonId[ev.pointerId]] = false;
-    delete pointerIdMapToButtonId[ev.pointerId];
+    const pointedId = pointerIdMapToId[ev.pointerId];
+    log("Button up:", pointedId);
+
+    if (buttonIds.includes(pointedId)) {
+        buttonState[pointedId] = false;
+    }
+
+    if (axis1DIds.includes(pointedId)) {
+        axis1DState[pointedId] = 0;
+    }
+
+    if (axis2DIds.includes(pointedId)) {
+        axis2DState[`${pointedId}X`] = 0;
+        axis2DState[`${pointedId}Y`] = 0;
+    }
+
+    delete pointerIdMapToId[ev.pointerId];
+
     sendState();
 };
