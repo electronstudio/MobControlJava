@@ -30,9 +30,6 @@ const overlayContext = hitboxCanvas.getContext('2d');
 // Canvas utils.
 //
 
-const axisBoundingBoxes = {
-}
-
 function getHitboxImagePixels(imageX, imageY, width, height) {
     return hitboxContext.getImageData(imageX, imageY, width || hitboxCanvas.scrollWidth, height || hitboxCanvas.scrollHeight).data;
 }
@@ -43,6 +40,10 @@ function getHitboxSize() {
         h: hitboxCanvas.scrollHeight,
     };
 }
+
+//
+// Utility to derive bounding box of a single colour.
+//
 
 function getHitboxRgbaBoundingBox(rgba) {
     const hitboxSize = getHitboxSize();
@@ -72,6 +73,13 @@ function getHitboxRgbaBoundingBox(rgba) {
     return [minX, minY, maxX - minX, maxY - minY];
 }
 
+//
+// Canvas initialisation.
+//
+
+const axisBoundingBoxes = {
+}
+
 function resizeCanvases() {
     hitboxCanvas.width = canvasParentDiv.scrollWidth;
     hitboxCanvas.height = canvasParentDiv.scrollHeight;
@@ -80,9 +88,11 @@ function resizeCanvases() {
 }
 
 function redrawCanvases() {
+    // Draw the controller graphic.
     const hitboxSize = getHitboxSize();
     hitboxContext.drawImage(hitboxImage, 0, 0, hitboxSize.w, hitboxSize.h);
 
+    // Derive and store the bounding boxes of the 1D axis colours.
     for (const pixelString of Object.keys(axis1DColors)) {
         const axisId = axis1DColors[pixelString]
         const rgba = pixelStringToRgba(pixelString);
@@ -93,6 +103,7 @@ function redrawCanvases() {
         overlayContext.strokeRect(...axisBoundingBoxes[axisId]);
     }
 
+    // Derive and store the bounding boxes of the 2D axis colours.
     for (const pixelString of Object.keys(axis2DColors)) {
         const axisId = axis2DColors[pixelString]
         const rgba = pixelStringToRgba(pixelString);
@@ -167,12 +178,15 @@ function rgbaToPixelString(rgba) {
 const buttonIds = Object.values(buttonColours);
 const axis1DIds = Object.values(axis1DColors);
 const axis2DIds = Object.values(axis2DColors);
+
 const buttonState = {};
 const axis1DState = {};
 const axis2DState = {};
+
 buttonIds.forEach(buttonId => { buttonState[buttonId] = false; });
 axis1DIds.forEach(axisId => { axis1DState[axisId] = 0; });
 axis2DIds.forEach(axisId => { axis1DState[`${axisId}X`] = 0; axis1DState[`${axisId}Y`] = 0; });
+
 const pointerIdMapToId = {};
 
 //
@@ -190,7 +204,7 @@ function sendState() {
 setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 
 //
-// Update state on interaction.
+// On interaction start, add entry into pointer map, update button state.
 //
 function onPointerDown(ev) {
     const imagePixel = hitboxContext.getImageData(ev.clientX, ev.clientY, 1, 1).data;
@@ -198,9 +212,9 @@ function onPointerDown(ev) {
 
     const buttonId = buttonColours[imagePixelString];
     if (buttonId) {
-        buttonState[buttonId] = true;
         pointerIdMapToId[ev.pointerId] = buttonId;
-        log("Button down:", buttonId);
+
+        buttonState[buttonId] = true;
         sendState();
     }
 
@@ -217,6 +231,9 @@ function onPointerDown(ev) {
 
 hitboxCanvas.onpointerdown = (ev) => { onPointerDown(ev); };
 
+//
+// On interaction move, update axis state.
+//
 function onPointerMove(ev) {
     const imagePixel = hitboxContext.getImageData(ev.clientX, ev.clientY, 1, 1).data;
     const imagePixelString = rgbaToPixelString(imagePixel.slice(0, 4));
@@ -227,6 +244,7 @@ function onPointerMove(ev) {
 
     if (axisId) {
         const pointedAxisId = pointerIdMapToId[ev.pointerId];
+
         if (axisId === pointedAxisId) {
             const bb = axisBoundingBoxes[axisId];
             if (bb) {
@@ -255,6 +273,9 @@ function onPointerMove(ev) {
 
 hitboxCanvas.onpointermove = (ev) => { onPointerMove(ev); };
 
+//
+// On interaction end, remove entry from pointer map, reset relevant state.
+//
 hitboxCanvas.onpointerup = (ev) => {
     const pointedId = pointerIdMapToId[ev.pointerId];
     log("Button up:", pointedId);
