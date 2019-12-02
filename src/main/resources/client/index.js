@@ -20,21 +20,82 @@ log(UPDATES_PER_SECOND);
 //
 // Load the canvas, context.
 //
-const hitboxParentDiv = document.getElementById('hitboxParentDiv');
+const canvasParentDiv = document.getElementById('canvasParentDiv');
 const hitboxCanvas = document.getElementById('hitboxCanvas');
 const hitboxContext = hitboxCanvas.getContext('2d');
+const overlayCanvas = document.getElementById('overlayCanvas');
+const overlayContext = hitboxCanvas.getContext('2d');
 
 //
 // Canvas utils.
 //
-function resizeCanvasAndDraw() {
-    hitboxCanvas.width = hitboxParentDiv.scrollWidth;
-    hitboxCanvas.height = hitboxParentDiv.scrollHeight;
-    hitboxContext.drawImage(hitboxImage, 0, 0, hitboxCanvas.scrollWidth, hitboxCanvas.scrollHeight);
+
+const axisBoundingBoxes = {
 }
 
 function getHitboxImagePixels(imageX, imageY, width, height) {
-    return hitboxContext.getImageData(imageX, imageY, width, height).data;
+    return hitboxContext.getImageData(imageX, imageY, width || hitboxCanvas.scrollWidth, height || hitboxCanvas.scrollHeight).data;
+}
+
+function getHitboxSize() {
+    return {
+        w: hitboxCanvas.scrollWidth,
+        h: hitboxCanvas.scrollHeight,
+    };
+}
+
+function getHitboxRgbaBoundingBox(rgba) {
+    const hitboxSize = getHitboxSize();
+    const allPixels = getHitboxImagePixels(0, 0);
+
+    let minX, minY, maxX, maxY = undefined;
+
+    for (var i=0; i<allPixels.length; i+=4) {
+        const pixelIndex = i / 4;
+        const pixelX = pixelIndex % hitboxSize.w;
+        const pixelY = Math.floor(pixelIndex / hitboxSize.w);
+
+        const colourMatches = true
+            && rgba[0] === allPixels[i+0]
+            && rgba[1] === allPixels[i+1]
+            && rgba[2] === allPixels[i+2]
+            && rgba[3] === allPixels[i+3];
+
+        if (colourMatches) {
+            if (minX === undefined || pixelX < minX) { minX = pixelX; }
+            if (maxX === undefined || pixelX > maxX) { maxX = pixelX; }
+            if (minY === undefined || pixelY < minY) { minY = pixelY; }
+            if (maxY === undefined || pixelY > maxY) { maxY = pixelY; }
+        }
+    }
+
+    return [minX, minY, maxX - minX, maxY - minY];
+}
+
+function resizeCanvases() {
+    hitboxCanvas.width = canvasParentDiv.scrollWidth;
+    hitboxCanvas.height = canvasParentDiv.scrollHeight;
+    overlayCanvas.width = canvasParentDiv.scrollWidth;
+    overlayCanvas.height = canvasParentDiv.scrollHeight;
+}
+
+function redrawCanvases() {
+    const hitboxSize = getHitboxSize();
+    hitboxContext.drawImage(hitboxImage, 0, 0, hitboxSize.w, hitboxSize.h);
+
+    for (const pixelString of Object.keys(axisColors)) {
+        const rgba = pixelStringToRgba(pixelString);
+        axisBoundingBoxes[pixelString] = getHitboxRgbaBoundingBox(rgba);
+
+        overlayContext.strokeStyle = 'yellow';
+        overlayContext.lineWidth = 2;
+        overlayContext.strokeRect(...axisBoundingBoxes[pixelString]);
+    }
+}
+
+function resizeCanvasAndDraw() {
+    resizeCanvases();
+    redrawCanvases();
 }
 
 //

@@ -18,7 +18,7 @@
 			display: flex;
 		}
 
-		#hitboxParentDiv {
+		#canvasParentDiv {
 			width: 100%;
 			height: 100vh;
 			position: relative;
@@ -37,6 +37,15 @@
 			outline: none;
 		}
 
+		#overlayCanvas {
+			display: block;
+			margin: 0;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+		}
+
 		textarea {
 			height: 100vh;
 		}
@@ -45,8 +54,9 @@
 </head>
 	<body>
 		<div id="container">
-			<div id="hitboxParentDiv">
+			<div id="canvasParentDiv">
 				<canvas id="hitboxCanvas"></canvas>
+				<canvas id="overlayCanvas"></canvas>
 			</div>
 			<!-- Uncomment the element below to enable log view -->
 			<textarea id="log"></textarea>
