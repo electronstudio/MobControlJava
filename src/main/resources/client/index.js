@@ -19,17 +19,28 @@ log(UPDATES_PER_SECOND);
 //
 // Load the canvas, context.
 //
+const hitboxParentDiv = document.getElementById('hitboxParentDiv');
 const hitboxCanvas = document.getElementById('hitboxCanvas');
 const hitboxContext = hitboxCanvas.getContext('2d');
+
+function resizeCanvasAndDraw() {
+    hitboxCanvas.width = hitboxParentDiv.scrollWidth;
+    hitboxCanvas.height = hitboxParentDiv.scrollHeight;
+    hitboxContext.drawImage(hitboxImage, 0, 0, hitboxCanvas.scrollWidth, hitboxCanvas.scrollHeight);
+}
 
 //
 // Load the image.
 //
 const hitboxImage = new Image;
 hitboxImage.addEventListener('load', function() {
-    hitboxContext.drawImage(hitboxImage, 0, 0, hitboxCanvas.width, hitboxCanvas.height);
+    resizeCanvasAndDraw();
 }, false);
 hitboxImage.src = './layout_logical.png';
+
+window.addEventListener('resize', function() {
+    resizeCanvasAndDraw();
+})
 
 //
 // Define the buttons.
