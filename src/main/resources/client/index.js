@@ -8,7 +8,8 @@ const UPDATES_PER_SECOND = 60; // Set to 60 at some point.
 // Logging.
 //
 const logElement = document.getElementById('log');
-function log(line) {
+function log(...tokens) {
+    const line = tokens.map(x => `${x}`).join(' ');
     if (logElement) {
         logElement.innerHTML = line + '\n' + logElement.innerHTML;
     }
@@ -23,10 +24,17 @@ const hitboxParentDiv = document.getElementById('hitboxParentDiv');
 const hitboxCanvas = document.getElementById('hitboxCanvas');
 const hitboxContext = hitboxCanvas.getContext('2d');
 
+//
+// Canvas utils.
+//
 function resizeCanvasAndDraw() {
     hitboxCanvas.width = hitboxParentDiv.scrollWidth;
     hitboxCanvas.height = hitboxParentDiv.scrollHeight;
     hitboxContext.drawImage(hitboxImage, 0, 0, hitboxCanvas.scrollWidth, hitboxCanvas.scrollHeight);
+}
+
+function getHitboxImagePixels(imageX, imageY, width, height) {
+    return hitboxContext.getImageData(imageX, imageY, width, height).data;
 }
 
 //
@@ -88,30 +96,22 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 // Update state on interaction.
 //
 function onCanvasInteraction(ev, activate) {
-    //log(JSON.stringify(ev));
-    const imageX = (ev.clientX / hitboxCanvas.scrollWidth) * hitboxCanvas.width;
-    const imageY = (ev.clientY / hitboxCanvas.scrollHeight) * hitboxCanvas.height;
-    //log(imageX, imageY)
-
-    const imagePixel = hitboxContext.getImageData(imageX, imageY, 1, 1).data;
+    const imagePixel = hitboxContext.getImageData(ev.clientX, ev.clientY, 1, 1).data;
     const imagePixelString = imagePixel.slice(0, 4).join(',');
-    //log(imagePixelString)
 
     const buttonId = buttonColours[imagePixelString];
     if (buttonId) {
         buttonState[buttonId] = activate;
         pointerIdMapToButtonId[ev.pointerId] = buttonId;
-        log("Button down: "+buttonId);
+        log("Button down:", buttonId);
         sendState();
     }
-
-
 }
 
 hitboxCanvas.onpointerdown = (ev) => { onCanvasInteraction(ev, true); };
 
 hitboxCanvas.onpointerup = (ev) => {
-    log("Button up: "+pointerIdMapToButtonId[ev.pointerId]);
+    log("Button up:", pointerIdMapToButtonId[ev.pointerId]);
     buttonState[pointerIdMapToButtonId[ev.pointerId]] = false;
     delete pointerIdMapToButtonId[ev.pointerId];
     sendState();
