@@ -24,24 +24,24 @@ logger.log(UPDATES_PER_SECOND);
 // Redraw.
 //
 function redraw() {
-    // Align canvas elements with the guide parent.
-    hitboxCanvas.width = canvasParentDiv.scrollWidth;
-    hitboxCanvas.height = canvasParentDiv.scrollHeight;
-    overlayCanvas.width = canvasParentDiv.scrollWidth;
-    overlayCanvas.height = canvasParentDiv.scrollHeight;
+	// Align canvas elements with the guide parent.
+	hitboxCanvas.width = canvasParentDiv.scrollWidth;
+	hitboxCanvas.height = canvasParentDiv.scrollHeight;
+	overlayCanvas.width = canvasParentDiv.scrollWidth;
+	overlayCanvas.height = canvasParentDiv.scrollHeight;
 
-    // Draw the image.
-    hitboxCanvasImage.drawImage(hitboxImage);
+	// Draw the image.
+	hitboxCanvasImage.drawImage(hitboxImage);
 
-    // Initialise bounding boxes based on what we've drawn.
-    padState.initAxisBoundingBoxes();
+	// Initialise bounding boxes based on what we've drawn.
+	padState.initAxisBoundingBoxes();
 
-    // Draw bounding boxes just for visual verification.
-    padState.getAxisBoundingBoxes().forEach((boundingBox) => {
-        hitboxCanvasImage.context.strokeStyle = 'red';
-        hitboxCanvasImage.context.lineWidth = 2;
-        hitboxCanvasImage.context.strokeRect(...boundingBox);
-    });
+	// Draw bounding boxes just for visual verification.
+	padState.getAxisBoundingBoxes().forEach((boundingBox) => {
+		hitboxCanvasImage.context.strokeStyle = 'red';
+		hitboxCanvasImage.context.lineWidth = 2;
+		hitboxCanvasImage.context.strokeRect(...boundingBox);
+	});
 }
 
 //
@@ -49,12 +49,12 @@ function redraw() {
 //
 const hitboxImage = new Image;
 hitboxImage.addEventListener('load', function() {
-    redraw();
+	redraw();
 }, false);
 hitboxImage.src = './layout_logical.png';
 
 window.addEventListener('resize', function() {
-    redraw();
+	redraw();
 })
 
 //
@@ -62,8 +62,8 @@ window.addEventListener('resize', function() {
 //
 const socket = new WebSocket(`ws://${ADDRESS}`);
 function sendState() {
-    const state = padState.getState();
-    socket.send(JSON.stringify(state, null, 4));
+	const state = padState.getState();
+	socket.send(JSON.stringify(state, null, 4));
 }
 
 //
@@ -75,18 +75,18 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 // React to user interaction.
 //
 hitboxCanvas.onpointerdown = (ev) => {
-    const imagePixel = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
-    padState.onPointerDown(imagePixel, ev.pointerId);
-    sendState();
- };
+	const imagePixel = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
+	padState.onPointerDown(imagePixel, ev.pointerId);
+	sendState();
+};
 
 hitboxCanvas.onpointermove = (ev) => {
-    const imagePixel = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
-    padState.onPointerMove(imagePixel, ev.pointerId, ev.clientX, ev.clientY);
-    sendState();
+	const imagePixel = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
+	padState.onPointerMove(imagePixel, ev.pointerId, ev.clientX, ev.clientY);
+	sendState();
 };
 
 hitboxCanvas.onpointerup = (ev) => {
-    padState.onPointerUp(ev.pointerId);
-    sendState();
+	padState.onPointerUp(ev.pointerId);
+	sendState();
 };
