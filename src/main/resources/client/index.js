@@ -34,38 +34,6 @@ function getHitboxSize() {
 }
 
 //
-// Utility to derive bounding box of a single colour.
-//
-
-function getHitboxRgbaBoundingBox(rgba) {
-    const hitboxSize = getHitboxSize();
-    const allPixels = getHitboxImagePixels(0, 0);
-
-    let minX, minY, maxX, maxY = undefined;
-
-    for (var i=0; i<allPixels.length; i+=4) {
-        const pixelIndex = i / 4;
-        const pixelX = pixelIndex % hitboxSize.w;
-        const pixelY = Math.floor(pixelIndex / hitboxSize.w);
-
-        const colourMatches = true
-            && rgba[0] === allPixels[i+0]
-            && rgba[1] === allPixels[i+1]
-            && rgba[2] === allPixels[i+2]
-            && rgba[3] === allPixels[i+3];
-
-        if (colourMatches) {
-            if (minX === undefined || pixelX < minX) { minX = pixelX; }
-            if (maxX === undefined || pixelX > maxX) { maxX = pixelX; }
-            if (minY === undefined || pixelY < minY) { minY = pixelY; }
-            if (maxY === undefined || pixelY > maxY) { maxY = pixelY; }
-        }
-    }
-
-    return [minX, minY, maxX - minX, maxY - minY];
-}
-
-//
 // Canvas initialisation.
 //
 
@@ -83,12 +51,13 @@ function redrawCanvases() {
     // Draw the controller graphic.
     const hitboxSize = getHitboxSize();
     hitboxContext.drawImage(hitboxImage, 0, 0, hitboxSize.w, hitboxSize.h);
+    const allPixels = getHitboxImagePixels(0, 0);
 
     // Derive and store the bounding boxes of the 1D axis colours.
     for (const pixelString of Object.keys(axis1DColors)) {
         const axisId = axis1DColors[pixelString]
         const rgba = pixelStringToRgba(pixelString);
-        axisBoundingBoxes[axisId] = getHitboxRgbaBoundingBox(rgba);
+        axisBoundingBoxes[axisId] = getHitboxRgbaBoundingBox(rgba, allPixels);
 
         overlayContext.strokeStyle = 'yellow';
         overlayContext.lineWidth = 2;
@@ -99,7 +68,7 @@ function redrawCanvases() {
     for (const pixelString of Object.keys(axis2DColors)) {
         const axisId = axis2DColors[pixelString]
         const rgba = pixelStringToRgba(pixelString);
-        axisBoundingBoxes[axisId] = getHitboxRgbaBoundingBox(rgba);
+        axisBoundingBoxes[axisId] = getHitboxRgbaBoundingBox(rgba, allPixels);
 
         overlayContext.strokeStyle = 'yellow';
         overlayContext.lineWidth = 2;
