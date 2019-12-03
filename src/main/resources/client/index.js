@@ -1,3 +1,10 @@
+/**
+ * MobControl Client
+ *
+ * Stores and updates internal representation of a pad based on user interaction.
+ * Transmits internal representation to server on regular intervals.
+ */
+
 //
 // Configuration.
 //
@@ -7,7 +14,7 @@ const UPDATES_PER_SECOND = 60;
 //
 // Get HTML elements.
 //
-const canvasParentDiv = document.getElementById('canvasParentDiv');
+const canvasGuide = document.getElementById('canvasGuide');
 const hitboxCanvas = document.getElementById('hitboxCanvas');
 const overlayCanvas = document.getElementById('overlayCanvas');
 const logElement = document.getElementById('log');
@@ -24,11 +31,11 @@ logger.log(UPDATES_PER_SECOND);
 // Redraw.
 //
 function redraw() {
-	// Align canvas elements with the guide parent.
-	hitboxCanvas.width = canvasParentDiv.scrollWidth;
-	hitboxCanvas.height = canvasParentDiv.scrollHeight;
-	overlayCanvas.width = canvasParentDiv.scrollWidth;
-	overlayCanvas.height = canvasParentDiv.scrollHeight;
+	// Align canvas elements with the canvas guide.
+	hitboxCanvas.width = canvasGuide.scrollWidth;
+	hitboxCanvas.height = canvasGuide.scrollHeight;
+	overlayCanvas.width = canvasGuide.scrollWidth;
+	overlayCanvas.height = canvasGuide.scrollHeight;
 
 	// Draw the image.
 	hitboxCanvasImage.drawImage(hitboxImage);
@@ -75,14 +82,14 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 // React to user interaction.
 //
 hitboxCanvas.onpointerdown = (ev) => {
-	const imagePixel = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
-	padState.onPointerDown(imagePixel, ev.pointerId);
+	const rgba = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
+	padState.onPointerDown(rgba, ev.pointerId);
 	sendState();
 };
 
 hitboxCanvas.onpointermove = (ev) => {
-	const imagePixel = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
-	padState.onPointerMove(imagePixel, ev.pointerId, ev.clientX, ev.clientY);
+	const rgba = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
+	padState.onPointerMove(rgba, ev.pointerId, ev.clientX, ev.clientY);
 	sendState();
 };
 
