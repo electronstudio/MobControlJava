@@ -38,9 +38,14 @@ CanvasImage.prototype.getSize = function() {
     };
 }
 
-CanvasImage.prototype.getPixels = function(imageX, imageY, width, height) {
+CanvasImage.prototype.drawImage = function(image) {
     const size = this.getSize();
-    return this.context.getImageData(imageX || 0, imageY || 0, width || size.w, height || size.h).data;
+    this.context.drawImage(hitboxImage, 0, 0, size.w, size.h);
+}
+
+CanvasImage.prototype.getPixels = function(x, y, w, h) {
+    const size = this.getSize();
+    return this.context.getImageData(x || 0, y || 0, w || size.w, h || size.h).data;
 }
 
 CanvasImage.prototype.getRgbaBoundingBox = function(rgba) {
