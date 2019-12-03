@@ -4,28 +4,26 @@
 const ADDRESS = `${new URL(window.location.href).hostname}/mobcontrol/`;
 const UPDATES_PER_SECOND = 60;
 
-const logElement = document.getElementById('log');
-const logger = new Logger(logElement);
-
-logger.log(UPDATES_PER_SECOND);
-
 //
 // Get HTML elements.
 //
 const canvasParentDiv = document.getElementById('canvasParentDiv');
 const hitboxCanvas = document.getElementById('hitboxCanvas');
 const overlayCanvas = document.getElementById('overlayCanvas');
+const logElement = document.getElementById('log');
 
 //
 // Initialise utilities.
 //
 const hitboxCanvasImage = new CanvasImage(hitboxCanvas);
 const padState = new PadState(hitboxCanvasImage);
+const logger = new Logger(logElement);
+logger.log(UPDATES_PER_SECOND);
 
 //
-// Calibration.
+// Redraw.
 //
-function calibrate() {
+function redraw() {
     // Align canvas elements with the guide parent.
     hitboxCanvas.width = canvasParentDiv.scrollWidth;
     hitboxCanvas.height = canvasParentDiv.scrollHeight;
@@ -51,12 +49,12 @@ function calibrate() {
 //
 const hitboxImage = new Image;
 hitboxImage.addEventListener('load', function() {
-    calibrate();
+    redraw();
 }, false);
 hitboxImage.src = './layout_logical.png';
 
 window.addEventListener('resize', function() {
-    calibrate();
+    redraw();
 })
 
 //
@@ -74,7 +72,7 @@ function sendState() {
 setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 
 //
-// On interaction start, add entry into pointer map, update button state.
+// React to user interaction.
 //
 hitboxCanvas.onpointerdown = (ev) => {
     const imagePixel = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
@@ -82,19 +80,12 @@ hitboxCanvas.onpointerdown = (ev) => {
     sendState();
  };
 
-//
-// On interaction move, update axis state.
-//
-
 hitboxCanvas.onpointermove = (ev) => {
     const imagePixel = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
     padState.onPointerMove(imagePixel, ev.pointerId, ev.clientX, ev.clientY);
     sendState();
 };
 
-//
-// On interaction end, remove entry from pointer map, reset relevant state.
-//
 hitboxCanvas.onpointerup = (ev) => {
     padState.onPointerUp(ev.pointerId);
     sendState();

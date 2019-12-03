@@ -1,3 +1,10 @@
+/**
+ * CanvasImage
+ *
+ * Given a HTML Canvas element, provides utilities to derive
+ * properties and read pixels drawn on the Canvas.
+ */
+
 //
 // Utility to derive bounding box of a single colour.
 //
