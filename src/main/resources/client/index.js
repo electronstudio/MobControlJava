@@ -18,25 +18,11 @@ const hitboxContext = hitboxCanvas.getContext('2d');
 const overlayCanvas = document.getElementById('overlayCanvas');
 const overlayContext = hitboxCanvas.getContext('2d');
 
-//
-// Canvas utils.
-//
-
-function getHitboxImagePixels(imageX, imageY, width, height) {
-    return hitboxContext.getImageData(imageX, imageY, width || hitboxCanvas.scrollWidth, height || hitboxCanvas.scrollHeight).data;
-}
-
-function getHitboxSize() {
-    return {
-        w: hitboxCanvas.scrollWidth,
-        h: hitboxCanvas.scrollHeight,
-    };
-}
+const hitboxCanvasImage = new CanvasImage(hitboxCanvas);
 
 //
 // Canvas initialisation.
 //
-
 const axisBoundingBoxes = {
 }
 
@@ -49,15 +35,14 @@ function resizeCanvases() {
 
 function redrawCanvases() {
     // Draw the controller graphic.
-    const hitboxSize = getHitboxSize();
+    const hitboxSize = hitboxCanvasImage.getSize();
     hitboxContext.drawImage(hitboxImage, 0, 0, hitboxSize.w, hitboxSize.h);
-    const allPixels = getHitboxImagePixels(0, 0);
 
     // Derive and store the bounding boxes of the 1D axis colours.
     for (const pixelString of Object.keys(axis1DColors)) {
         const axisId = axis1DColors[pixelString]
         const rgba = pixelStringToRgba(pixelString);
-        axisBoundingBoxes[axisId] = getHitboxRgbaBoundingBox(rgba, allPixels);
+        axisBoundingBoxes[axisId] = hitboxCanvasImage.getRgbaBoundingBox(rgba);
 
         overlayContext.strokeStyle = 'yellow';
         overlayContext.lineWidth = 2;
@@ -68,7 +53,7 @@ function redrawCanvases() {
     for (const pixelString of Object.keys(axis2DColors)) {
         const axisId = axis2DColors[pixelString]
         const rgba = pixelStringToRgba(pixelString);
-        axisBoundingBoxes[axisId] = getHitboxRgbaBoundingBox(rgba, allPixels);
+        axisBoundingBoxes[axisId] = hitboxCanvasImage.getRgbaBoundingBox(rgba);
 
         overlayContext.strokeStyle = 'yellow';
         overlayContext.lineWidth = 2;
