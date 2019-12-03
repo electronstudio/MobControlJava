@@ -17,15 +17,13 @@ const UPDATES_PER_SECOND = 60;
 const canvasGuide = document.getElementById('canvasGuide');
 const hitboxCanvas = document.getElementById('hitboxCanvas');
 const overlayCanvas = document.getElementById('overlayCanvas');
-const logElement = document.getElementById('log');
 
 //
 // Initialise utilities.
 //
 const hitboxCanvasImage = new CanvasImage(hitboxCanvas);
 const padState = new PadState(hitboxCanvasImage);
-const logger = new Logger(logElement);
-logger.log(UPDATES_PER_SECOND);
+log(UPDATES_PER_SECOND);
 
 //
 // Redraw.
