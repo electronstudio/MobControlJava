@@ -85,24 +85,12 @@ function PadState(hitboxCanvasImage) {
 	// Cache of bounding boxes for axis-inputs.
 	this.axisBoundingBoxes = {};
 
-	this.initialiseState();
+	this.resetState();
 }
 
-PadState.prototype.initialiseState = function() {
-	buttons.forEach(button => {
-		this.buttonState[button] = false;
-	});
-
-	axis1Ds.forEach(axis => {
-		this.axis1DState[axis] = 0;
-	});
-
-	axis2Ds.forEach(axis => {
-		this.axis1DState[`${axis}X`] = 0;
-		this.axis1DState[`${axis}Y`] = 0;
-	});
-}
-
+//
+// Bounding box init.
+//
 PadState.prototype.initAxisBoundingBoxes = function() {
 	// Derive and store the bounding boxes of the 1D axis colours.
 	for (const pixelString of Object.keys(axis1DColours)) {
@@ -119,39 +107,84 @@ PadState.prototype.initAxisBoundingBoxes = function() {
 	}
 }
 
+//
+// Bounding box get.
+//
 PadState.prototype.getAxisBoundingBoxes = function() {
 	return Object.values(this.axisBoundingBoxes);
 }
 
 //
+// State reset.
+//
+PadState.prototype.resetButton = function(button) {
+	this.buttonState[button] = false;
+}
+
+PadState.prototype.resetAxis1D = function(axis1D) {
+	this.axis1DState[axis1D] = 0;
+}
+
+PadState.prototype.resetAxis2D = function(axis2D) {
+	this.axis2DState[`${axis2D}X`] = 0;
+	this.axis2DState[`${axis2D}Y`] = 0;
+}
+
+PadState.prototype.resetState = function() {
+	buttons.forEach(button => { this.resetButton(button); });
+	axis1Ds.forEach(axis1D => { this.resetAxis1D(axis1D); });
+	axis2Ds.forEach(axis2D => { this.resetAxis2D(axis2D); });
+}
+
+//
+// State update.
+//
+PadState.prototype.updateButton = function(button, activate) {
+	this.buttonState[button] = activate;
+}
+
+PadState.prototype.updateAxis1D = function(axis1D, absX, absY) {
+	const boundingBox = this.axisBoundingBoxes[axis1D];
+	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
+	this.axis1DState[axis1D] = -relY;
+}
+
+PadState.prototype.updateAxis2D = function(axis2D, absX, absY) {
+	const boundingBox = this.axisBoundingBoxes[axis2D];
+	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
+	this.axis2DState[`${axis2D}X`] = relX;
+	this.axis2DState[`${axis2D}Y`] = -relY;
+}
+
+//
+// State get.
+//
+PadState.prototype.getState = function() {
+	return {
+		...this.buttonState,
+		...this.axis1DState,
+		...this.axis2DState,
+	};
+}
+
+//
 // React to pointer down/move/up.
 //
-PadState.prototype.onPointerDown = function(rgba, pointer) {
-	// Find the associated input.
+PadState.prototype.onPointerDown = function(rgba, pointer, absX, absY) {
+	// Get associated input.
 	const imagePixelString = rgbaToPixelString(rgba);
 	const button = buttonColours[imagePixelString];
 	const axis1D = axis1DColours[imagePixelString];
 	const axis2D = axis2DColours[imagePixelString];
-
 	const input = button || axis1D || axis2D;
 
-	// Set state, according to the input type.
-	if (button) {
-		this.buttonState[button] = true;
-	}
+	// Update state.
+	if (button) { this.updateButton(input, true); }
+	if (axis1D) { this.updateAxis1D(input, absX, absY); }
+	if (axis2D) { this.updateAxis2D(input, absX, absY); }
 
-	if (axis1D) {
-		// TODO: Update state.
-	}
-
-	if (axis2D) {
-		// TODO: Update state.
-	}
-
-	// Update the pointer cache.
-	if (input) {
-		this.pointerToPointerDownInput[pointer] = input;
-	}
+	// Update pointer cache.
+	if (input) { this.pointerToPointerDownInput[pointer] = input; }
 }
 
 PadState.prototype.onPointerMove = function(rgba, pointer, absX, absY) {
@@ -172,47 +205,22 @@ PadState.prototype.onPointerMove = function(rgba, pointer, absX, absY) {
 
 			// If there have an associated bounding box... (no reason why there shouldn't be)
 			if (boundingBox) {
-				const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
-
-				if (axis1D) {
-					this.axis1DState[axis1D] = -relY;
-				}
-
-				if (axis2D) {
-					this.axis2DState[`${axis2D}X`] = relX;
-					this.axis2DState[`${axis2D}Y`] = -relY;
-				}
+				if (axis1D) { this.updateAxis1D(axis1D, absX, absY); }
+				if (axis2D) { this.updateAxis2D(axis2D, absX, absY); }
 			}
 		}
 	}
 }
 
 PadState.prototype.onPointerUp = function(pointer) {
-	// Find the original input.
+	// Get associated input.
 	const pointerDownInput = this.pointerToPointerDownInput[pointer];
 
-	// Reset the state, according to the input type.
-	if (buttons.includes(pointerDownInput)) {
-		this.buttonState[pointerDownInput] = false;
-	}
+	// Update state.
+	if (buttons.includes(pointerDownInput)) { this.resetButton(pointerDownInput); }
+	if (axis1Ds.includes(pointerDownInput)) { this.resetAxis1D(pointerDownInput); }
+	if (axis2Ds.includes(pointerDownInput)) { this.resetAxis2D(pointerDownInput); }
 
-	if (axis1Ds.includes(pointerDownInput)) {
-		this.axis1DState[pointerDownInput] = 0;
-	}
-
-	if (axis2Ds.includes(pointerDownInput)) {
-		this.axis2DState[`${pointerDownInput}X`] = 0;
-		this.axis2DState[`${pointerDownInput}Y`] = 0;
-	}
-
-	// Reset the pointer cache.
+	// Update pointer cache.
 	delete this.pointerToPointerDownInput[pointer];
-}
-
-PadState.prototype.getState = function() {
-	return {
-		...this.buttonState,
-		...this.axis1DState,
-		...this.axis2DState,
-	};
 }

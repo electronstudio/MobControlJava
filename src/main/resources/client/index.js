@@ -83,7 +83,7 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 //
 hitboxCanvas.onpointerdown = (ev) => {
 	const rgba = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
-	padState.onPointerDown(rgba, ev.pointerId);
+	padState.onPointerDown(rgba, ev.pointerId, ev.clientX, ev.clientY);
 	sendState();
 };
 
