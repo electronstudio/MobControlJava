@@ -2,20 +2,12 @@
 // Configuration.
 //
 const ADDRESS = `${new URL(window.location.href).hostname}/mobcontrol/`;
-const UPDATES_PER_SECOND = 60; // Set to 60 at some point.
+const UPDATES_PER_SECOND = 60;
 
-//
-// Logging.
-//
 const logElement = document.getElementById('log');
-function log(...tokens) {
-    const line = tokens.map(x => `${x}`).join(' ');
-    if (logElement) {
-        logElement.innerHTML = line + '\n' + logElement.innerHTML;
-    }
-}
+const logger = new Logger(logElement);
 
-log(UPDATES_PER_SECOND);
+logger.log(UPDATES_PER_SECOND);
 
 //
 // Load the canvas, context.
@@ -278,7 +270,7 @@ hitboxCanvas.onpointermove = (ev) => { onPointerMove(ev); };
 //
 hitboxCanvas.onpointerup = (ev) => {
     const pointedId = pointerIdMapToId[ev.pointerId];
-    log("Button up:", pointedId);
+    logger.log("Button up:", pointedId);
 
     if (buttonIds.includes(pointedId)) {
         buttonState[pointedId] = false;
