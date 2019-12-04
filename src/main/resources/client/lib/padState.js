@@ -87,10 +87,7 @@ function PadState(sectionCanvasImage) {
 	this.sectionCanvasImage = sectionCanvasImage;
 
 	// State of the pad.
-	this.dirpadState = {};
-	this.buttonState = {};
-	this.axis1DState = {};
-	this.axis2DState = {};
+	this.state = {};
 
 	// Cache of active pointers to associated info.
 	this.activePointerInfoMap = {};
@@ -142,23 +139,23 @@ PadState.prototype.getActivePointerInfos = function() {
 // State reset.
 //
 PadState.prototype.resetDirpad = function(dirpad) {
-	this.dirpadState[`${dirpad}_LEFT`] = 0;
-	this.dirpadState[`${dirpad}_RIGHT`] = 0;
-	this.dirpadState[`${dirpad}_UP`] = 0;
-	this.dirpadState[`${dirpad}_DOWN`] = 0;
+	this.state[`${dirpad}_LEFT`] = 0;
+	this.state[`${dirpad}_RIGHT`] = 0;
+	this.state[`${dirpad}_UP`] = 0;
+	this.state[`${dirpad}_DOWN`] = 0;
 }
 
 PadState.prototype.resetButton = function(button) {
-	this.buttonState[button] = false;
+	this.state[button] = false;
 }
 
 PadState.prototype.resetAxis1D = function(axis1D) {
-	this.axis1DState[axis1D] = 0;
+	this.state[axis1D] = 0;
 }
 
 PadState.prototype.resetAxis2D = function(axis2D) {
-	this.axis2DState[`${axis2D}X`] = 0;
-	this.axis2DState[`${axis2D}Y`] = 0;
+	this.state[`${axis2D}X`] = 0;
+	this.state[`${axis2D}Y`] = 0;
 }
 
 PadState.prototype.resetState = function() {
@@ -176,20 +173,20 @@ PadState.prototype.updateDirpad = function(pointer, dirpad, absX, absY) {
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 
 	const deadZone = 0.3;
-	this.dirpadState[`${dirpad}_LEFT`] = relX < -deadZone;
-	this.dirpadState[`${dirpad}_RIGHT`] = relX > +deadZone;
-	this.dirpadState[`${dirpad}_UP`] = relY < -deadZone;
-	this.dirpadState[`${dirpad}_DOWN`] = relY > +deadZone;
+	this.state[`${dirpad}_LEFT`] = relX < -deadZone;
+	this.state[`${dirpad}_RIGHT`] = relX > +deadZone;
+	this.state[`${dirpad}_UP`] = relY < -deadZone;
+	this.state[`${dirpad}_DOWN`] = relY > +deadZone;
 }
 
 PadState.prototype.updateButton = function(pointer, button, absX, absY) {
-	this.buttonState[button] = true;
+	this.state[button] = true;
 }
 
 PadState.prototype.updateAxis1D = function(pointer, axis1D, absX, absY) {
 	const boundingBox = this.colourBoundingBoxes[axis1D];
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
-	this.axis1DState[axis1D] = (-relY / 2) + 0.5;
+	this.state[axis1D] = (-relY / 2) + 0.5;
 }
 
 PadState.prototype.updateAxis2D = function(pointer, axis2D, absX, absY) {
@@ -203,20 +200,15 @@ PadState.prototype.updateAxis2D = function(pointer, axis2D, absX, absY) {
 	];
 
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
-	this.axis2DState[`${axis2D}X`] = relX;
-	this.axis2DState[`${axis2D}Y`] = -relY;
+	this.state[`${axis2D}X`] = relX;
+	this.state[`${axis2D}Y`] = -relY;
 }
 
 //
 // State get.
 //
 PadState.prototype.getState = function() {
-	return {
-		...this.dirpadState,
-		...this.buttonState,
-		...this.axis1DState,
-		...this.axis2DState,
-	};
+	return this.state;
 }
 
 //
