@@ -10,46 +10,48 @@
 // Expected colours, for each input type.
 //
 
-const dirpadColours = {
-	// Redundant info but it makes the lookup much easier.
-	'63,11,10,255': 'BUTTON_DPAD',
-	'48,58,48,255': 'BUTTON_DPAD',
-	'61,49,39,255': 'BUTTON_DPAD',
-	'46,41,58,255': 'BUTTON_DPAD',
-	'63,11,10,255|48,58,48,255|61,49,39,255|46,41,58,255': 'BUTTON_DPAD',
-};
+const inputColours = {
+	dirpad: {
+		// Redundant info but it makes the lookup much easier.
+		'63,11,10,255': 'BUTTON_DPAD',
+		'48,58,48,255': 'BUTTON_DPAD',
+		'61,49,39,255': 'BUTTON_DPAD',
+		'46,41,58,255': 'BUTTON_DPAD',
+		'63,11,10,255|48,58,48,255|61,49,39,255|46,41,58,255': 'BUTTON_DPAD',
+	},
+	button: {
+		'58,47,42,255': 'BUTTON_A',
+		'46,56,48,255': 'BUTTON_B',
+		'53,31,41,255': 'BUTTON_X',
+		'23,15,53,255': 'BUTTON_Y',
+		'34,51,45,255': 'BUTTON_BACK',
+		'51,35,41,255': 'BUTTON_GUIDE',
+		'44,51,28,255': 'BUTTON_START',
+		'33,38,51,255': 'BUTTON_LEFTSTICK',
+		'51,48,26,255': 'BUTTON_RIGHTSTICK',
+		'51,14,31,255': 'BUTTON_LEFTSHOULDER',
+		'23,31,53,255': 'BUTTON_RIGHTSHOULDER',
+	},
+	axis1D: {
+		'255,255,255,255': 'AXIS_TRIGGERLEFT',
+		'0,0,0,255': 'AXIS_TRIGGERRIGHT',
+	},
+	axis2D: {
+		'255,0,0,255': 'AXIS_LEFT',
+		'0,255,242,255': 'AXIS_RIGHT',
+	},
+}
 
-const buttonColours = {
-	'58,47,42,255': 'BUTTON_A',
-	'46,56,48,255': 'BUTTON_B',
-	'53,31,41,255': 'BUTTON_X',
-	'23,15,53,255': 'BUTTON_Y',
-	'34,51,45,255': 'BUTTON_BACK',
-	'51,35,41,255': 'BUTTON_GUIDE',
-	'44,51,28,255': 'BUTTON_START',
-	'33,38,51,255': 'BUTTON_LEFTSTICK',
-	'51,48,26,255': 'BUTTON_RIGHTSTICK',
-	'51,14,31,255': 'BUTTON_LEFTSHOULDER',
-	'23,31,53,255': 'BUTTON_RIGHTSHOULDER',
-};
-
-const axis1DColours = {
-	'255,255,255,255': 'AXIS_TRIGGERLEFT',
-	'0,0,0,255': 'AXIS_TRIGGERRIGHT',
-};
-
-const axis2DColours = {
-	'255,0,0,255': 'AXIS_LEFT',
-	'0,255,242,255': 'AXIS_RIGHT',
-};
-
-//
-// IDs for each input, for convenience.
-//
-const dirpads = Object.values(dirpadColours);
-const buttons = Object.values(buttonColours);
-const axis1Ds = Object.values(axis1DColours);
-const axis2Ds = Object.values(axis2DColours);
+function getInputTypeFromInputId(inputId) {
+	for (const inputType of Object.keys(inputColours)) {
+		const inputColoursOfType = inputColours[inputType];
+		const inputIdsOfType = Object.values(inputColoursOfType);
+		if (inputIdsOfType.includes(inputId)) {
+			return inputType;
+		}
+	}
+	return 'unknown';
+}
 
 //
 // RGBA serialisation.
@@ -104,22 +106,22 @@ function PadState(sectionCanvasImage) {
 //
 PadState.prototype.initAxisBoundingBoxes = function() {
 	// Derive and store the bounding boxes of the dirpad colours.
-	for (const pixelString of Object.keys(dirpadColours)) {
-		const dirpad = dirpadColours[pixelString]
+	for (const pixelString of Object.keys(inputColours.dirpad)) {
+		const dirpad = inputColours.dirpad[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
 		this.colourBoundingBoxes[dirpad] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 
 	// Derive and store the bounding boxes of the 1D axis colours.
-	for (const pixelString of Object.keys(axis1DColours)) {
-		const axis = axis1DColours[pixelString]
+	for (const pixelString of Object.keys(inputColours.axis1D)) {
+		const axis = inputColours.axis1D[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
 		this.colourBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 
 	// Derive and store the bounding boxes of the 2D axis colours.
-	for (const pixelString of Object.keys(axis2DColours)) {
-		const axis = axis2DColours[pixelString]
+	for (const pixelString of Object.keys(inputColours.axis2D)) {
+		const axis = inputColours.axis2D[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
 		this.colourBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
@@ -160,10 +162,10 @@ PadState.prototype.resetAxis2D = function(axis2D) {
 }
 
 PadState.prototype.resetState = function() {
-	dirpads.forEach(dirpad => { this.resetDirpad(dirpad); });
-	buttons.forEach(button => { this.resetButton(button); });
-	axis1Ds.forEach(axis1D => { this.resetAxis1D(axis1D); });
-	axis2Ds.forEach(axis2D => { this.resetAxis2D(axis2D); });
+	Object.values(inputColours.dirpad).forEach(dirpad => { this.resetDirpad(dirpad); });
+	Object.values(inputColours.button).forEach(button => { this.resetButton(button); });
+	Object.values(inputColours.axis1D).forEach(axis1D => { this.resetAxis1D(axis1D); });
+	Object.values(inputColours.axis2D).forEach(axis2D => { this.resetAxis2D(axis2D); });
 }
 
 //
@@ -225,10 +227,10 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 	const imagePixelString = rgbaToPixelString(rgba);
 
 	// Get associated input.
-	const dirpad = dirpadColours[imagePixelString];
-	const button = buttonColours[imagePixelString];
-	const axis1D = axis1DColours[imagePixelString];
-	const axis2D = axis2DColours[imagePixelString];
+	const dirpad = inputColours.dirpad[imagePixelString];
+	const button = inputColours.button[imagePixelString];
+	const axis1D = inputColours.axis1D[imagePixelString];
+	const axis2D = inputColours.axis2D[imagePixelString];
 	const input = dirpad || button || axis1D || axis2D;
 
 	// Update pointer cache.
@@ -244,23 +246,28 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 	}
 
 	// Update state.
-	if (dirpad) { this.updateDirpad(pointer, input, absX, absY); }
-	if (button) { this.updateButton(pointer, input, absX, absY); }
-	if (axis1D) { this.updateAxis1D(pointer, input, absX, absY); }
-	if (axis2D) { this.updateAxis2D(pointer, input, absX, absY); }
+	const inputType = getInputTypeFromInputId(input);
+
+	switch(inputType) {
+		case 'dirpad': { this.updateDirpad(pointer, input, absX, absY); break; }
+		case 'button': { this.updateButton(pointer, input, absX, absY); break; }
+		case 'axis1D': { this.updateAxis1D(pointer, input, absX, absY); break; }
+		case 'axis2D': { this.updateAxis2D(pointer, input, absX, absY); break; }
+		default: {}
+	}
 }
 
 PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 	// Which input did the pointer start from?
 	const pointerInfo = this.activePointerInfoMap[pointer];
 	const pointerDownInput = pointerInfo && pointerInfo.input;
+	if (!pointerDownInput) {
+		return;
+	}
 
 	// What is the input type?
-	const isDirpad = dirpads.includes(pointerDownInput);
-	const isAxis1D = axis1Ds.includes(pointerDownInput);
-	const isAxis2D = axis2Ds.includes(pointerDownInput);
-
-	const legalMove = isDirpad || isAxis1D || isAxis2D;
+	const inputType = getInputTypeFromInputId(pointerDownInput);
+	const legalMove = ['dirpad', 'axis1D', 'axis2D'].includes(inputType);
 	if (legalMove) {
 		Object.assign(this.activePointerInfoMap[pointer], {
 			movePosition: {
@@ -269,9 +276,12 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 			},
 		});
 
-		if (isDirpad) { this.updateDirpad(pointer, pointerDownInput, absX, absY); }
-		if (isAxis1D) { this.updateAxis1D(pointer, pointerDownInput, absX, absY); }
-		if (isAxis2D) { this.updateAxis2D(pointer, pointerDownInput, absX, absY); }
+		switch(inputType) {
+			case 'dirpad': { this.updateDirpad(pointer, pointerDownInput, absX, absY); break; }
+			case 'axis1D': { this.updateAxis1D(pointer, pointerDownInput, absX, absY); break; }
+			case 'axis2D': { this.updateAxis2D(pointer, pointerDownInput, absX, absY); break; }
+			default: {}
+		}
 	}
 }
 
@@ -280,10 +290,15 @@ PadState.prototype.onPointerUp = function(pointer) {
 	const pointerDownInput = this.activePointerInfoMap[pointer].input;
 
 	// Update state.
-	if (dirpads.includes(pointerDownInput)) { this.resetDirpad(pointerDownInput); }
-	if (buttons.includes(pointerDownInput)) { this.resetButton(pointerDownInput); }
-	if (axis1Ds.includes(pointerDownInput)) { this.resetAxis1D(pointerDownInput); }
-	if (axis2Ds.includes(pointerDownInput)) { this.resetAxis2D(pointerDownInput); }
+	const inputType = getInputTypeFromInputId(pointerDownInput);
+
+	switch(inputType) {
+		case 'dirpad': { this.resetDirpad(pointerDownInput); break; }
+		case 'button': { this.resetButton(pointerDownInput); break; }
+		case 'axis1D': { this.resetAxis1D(pointerDownInput); break; }
+		case 'axis2D': { this.resetAxis2D(pointerDownInput); break; }
+		default: {}
+	}
 
 	// Update pointer cache.
 	delete this.activePointerInfoMap[pointer];
