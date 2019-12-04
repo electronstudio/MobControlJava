@@ -86,3 +86,10 @@ CanvasImage.prototype.drawCircle = function(x, y, r) {
 	this.context.strokeStyle = '#003300';
 	this.context.stroke();
 }
+
+CanvasImage.prototype.drawLine = function(x1, y1, x2, y2) {
+	this.context.beginPath();
+	this.context.moveTo(x1, y1);
+	this.context.lineTo(x2, y2);
+	this.context.stroke();
+}

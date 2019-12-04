@@ -60,9 +60,9 @@ function redrawBase() {
 }
 
 function redrawOverlay() {
+	// Draw internal state on the overlay for visual verification that the code is doing what it should be doing.
 	overlayCanvasImage.clear();
 
-	// Draw bounding boxes just for visual verification.
 	padState.getAxisBoundingBoxes().forEach((boundingBox) => {
 		overlayCanvasImage.drawBoundingBox(boundingBox);
 	});
@@ -70,12 +70,11 @@ function redrawOverlay() {
 	padState.getActivePointerInfos().forEach(pointerInfo => {
 		const { downPosition, movePosition } = pointerInfo;
 
-		if (downPosition) {
-			overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, 3);
-		}
+		overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, 3);
 
 		if (movePosition) {
 			overlayCanvasImage.drawCircle(movePosition.absX, movePosition.absY, 6);
+			overlayCanvasImage.drawLine(downPosition.absX, downPosition.absY, movePosition.absX, movePosition.absY);
 		}
 	});
 }
