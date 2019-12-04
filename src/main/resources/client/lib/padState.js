@@ -145,10 +145,10 @@ PadState.prototype.getActivePointerInfos = function() {
 //
 PadState.prototype.resetDirpad = function(dirpad) {
 	this.setState({
-		[`${dirpad}_LEFT`]: 0,
-		[`${dirpad}_RIGHT`]: 0,
-		[`${dirpad}_UP`]: 0,
-		[`${dirpad}_DOWN`]: 0,
+		[`${dirpad}_LEFT`]: false,
+		[`${dirpad}_RIGHT`]: false,
+		[`${dirpad}_UP`]: false,
+		[`${dirpad}_DOWN`]: false,
 	});
 }
 
