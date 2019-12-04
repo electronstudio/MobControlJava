@@ -39,7 +39,8 @@ const graphicImage = getImage('./controller.svg', redraw);
 //
 const hitboxCanvasImage = new CanvasImage(hitboxCanvas, hitboxImage);
 const graphicCanvasImage = new CanvasImage(graphicCanvas, graphicImage);
-const canvasImages = [hitboxCanvasImage, graphicCanvasImage];
+const overlayCanvasImage = new CanvasImage(overlayCanvas, null);
+const canvasImages = [hitboxCanvasImage, graphicCanvasImage, overlayCanvasImage];
 
 const padState = new PadState(hitboxCanvasImage);
 
@@ -48,27 +49,40 @@ log(UPDATES_PER_SECOND);
 //
 // Redraw.
 //
-function redraw() {
-	// Align canvas elements with the canvas guide.
-	canvases.forEach(canvas => {
-		canvas.width = canvasGuide.scrollWidth;
-		canvas.height = canvasGuide.scrollHeight;
-	});
-
-	// Draw images.
+function redrawBase() {
 	canvasImages.forEach(canvasImage => {
+		canvasImage.alignWithElement(canvasGuide);
 		canvasImage.drawImage();
 	});
 
 	// Initialise bounding boxes based on what we've drawn.
 	padState.initAxisBoundingBoxes();
+}
+
+function redrawOverlay() {
+	overlayCanvasImage.clear();
 
 	// Draw bounding boxes just for visual verification.
 	padState.getAxisBoundingBoxes().forEach((boundingBox) => {
-		hitboxCanvasImage.context.strokeStyle = 'red';
-		hitboxCanvasImage.context.lineWidth = 2;
-		hitboxCanvasImage.context.strokeRect(...boundingBox);
+		overlayCanvasImage.drawBoundingBox(boundingBox);
 	});
+
+	padState.getActivePointerInfos().forEach(pointerInfo => {
+		const { downPosition, movePosition } = pointerInfo;
+
+		if (downPosition) {
+			overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, 3);
+		}
+
+		if (movePosition) {
+			overlayCanvasImage.drawCircle(movePosition.absX, movePosition.absY, 6);
+		}
+	});
+}
+
+function redraw() {
+	redrawBase();
+	redrawOverlay();
 }
 
 window.addEventListener('resize', function() {
@@ -94,15 +108,18 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 //
 hitboxCanvas.onpointerdown = (ev) => {
 	padState.onPointerDown(ev.pointerId, ev.clientX, ev.clientY);
+	redrawOverlay();
 	sendState();
 };
 
 hitboxCanvas.onpointermove = (ev) => {
 	padState.onPointerMove(ev.pointerId, ev.clientX, ev.clientY);
+	redrawOverlay();
 	sendState();
 };
 
 hitboxCanvas.onpointerup = (ev) => {
 	padState.onPointerUp(ev.pointerId);
+	redrawOverlay();
 	sendState();
 };

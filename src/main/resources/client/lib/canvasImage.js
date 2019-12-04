@@ -46,7 +46,13 @@ CanvasImage.prototype.getSize = function() {
 	};
 }
 
-CanvasImage.prototype.drawImage = function(image) {
+CanvasImage.prototype.alignWithElement = function(element) {
+	this.canvasElement.width = element.scrollWidth;
+	this.canvasElement.height = element.scrollHeight;
+}
+
+CanvasImage.prototype.drawImage = function() {
+	if (!this.image) { return; }
 	const size = this.getSize();
 	this.context.drawImage(this.image, 0, 0, size.w, size.h);
 }
@@ -58,4 +64,25 @@ CanvasImage.prototype.getPixels = function(x, y, w, h) {
 
 CanvasImage.prototype.getRgbaBoundingBox = function(rgba) {
 	return getRgbaBoundingBox(rgba, this.getPixels(), this.getSize().w);
+}
+
+CanvasImage.prototype.clear = function() {
+	const size = this.getSize();
+	this.context.clearRect(0, 0, size.w, size.h);
+}
+
+CanvasImage.prototype.drawBoundingBox = function(boundingBox) {
+	this.context.strokeStyle = 'yellow';
+	this.context.lineWidth = 4;
+	this.context.strokeRect(...boundingBox);
+}
+
+CanvasImage.prototype.drawCircle = function(x, y, r) {
+	this.context.beginPath();
+	this.context.arc(x, y, r, 0, 2 * Math.PI, false);
+	this.context.fillStyle = 'green';
+	this.context.fill();
+	this.context.lineWidth = 5;
+	this.context.strokeStyle = '#003300';
+	this.context.stroke();
 }

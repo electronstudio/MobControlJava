@@ -223,6 +223,13 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 			if (boundingBox) {
 				if (axis1D) { this.updateAxis1D(axis1D, absX, absY); }
 				if (axis2D) { this.updateAxis2D(axis2D, absX, absY); }
+
+				Object.assign(this.activePointerInfoMap[pointer], {
+					movePosition: {
+						absX,
+						absY,
+					},
+				});
 			}
 		}
 	}
