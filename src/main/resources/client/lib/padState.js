@@ -221,7 +221,7 @@ PadState.prototype.updateAxis2D = function(pointer, axis2D, absX, absY) {
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 	this.setState({
 		[`${axis2D}X`]: relX,
-		[`${axis2D}Y`]: -relY,
+		[`${axis2D}Y`]: relY,
 	});
 }
 
