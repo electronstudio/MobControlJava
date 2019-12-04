@@ -69,14 +69,16 @@ function redrawOverlay() {
 
 	padState.getActivePointerInfos().forEach(pointerInfo => {
 		const { downPosition, movePosition, extentRadius } = pointerInfo;
+		const fillStyle = 'rgba(0,0,0,0.1)';
+		const strokeStyle = 'rgba(0,0,0,0.3)';
 
-		overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, 3);
+		overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, 3, fillStyle, strokeStyle);
 
 		if (movePosition) {
 			if (extentRadius) {
-				overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, extentRadius);
+				overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, extentRadius, fillStyle, strokeStyle);
 			}
-			overlayCanvasImage.drawCircle(movePosition.absX, movePosition.absY, 6);
+			overlayCanvasImage.drawCircle(movePosition.absX, movePosition.absY, 6, fillStyle, strokeStyle);
 			overlayCanvasImage.drawLine(downPosition.absX, downPosition.absY, movePosition.absX, movePosition.absY);
 		}
 	});

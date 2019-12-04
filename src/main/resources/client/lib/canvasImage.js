@@ -77,13 +77,13 @@ CanvasImage.prototype.drawBoundingBox = function(boundingBox) {
 	this.context.strokeRect(...boundingBox);
 }
 
-CanvasImage.prototype.drawCircle = function(x, y, r) {
+CanvasImage.prototype.drawCircle = function(x, y, r, fillStyle, strokeStyle) {
 	this.context.beginPath();
 	this.context.arc(x, y, r, 0, 2 * Math.PI, false);
-	this.context.fillStyle = 'green';
+	this.context.fillStyle = fillStyle;
 	this.context.fill();
 	this.context.lineWidth = 5;
-	this.context.strokeStyle = '#003300';
+	this.context.strokeStyle = strokeStyle;
 	this.context.stroke();
 }
 

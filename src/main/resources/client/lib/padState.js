@@ -200,7 +200,7 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 				absX,
 				absY,
 			},
-			extentRadius: 200,
+			extentRadius: axis2D && 200,
 		};
 	}
 
