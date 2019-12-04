@@ -170,9 +170,11 @@ PadState.prototype.getState = function() {
 //
 // React to pointer down/move/up.
 //
-PadState.prototype.onPointerDown = function(rgba, pointer, absX, absY) {
-	// Get associated input.
+PadState.prototype.onPointerDown = function(pointer, absX, absY) {
+	const rgba = hitboxCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
 	const imagePixelString = rgbaToPixelString(rgba);
+
+	// Get associated input.
 	const button = buttonColours[imagePixelString];
 	const axis1D = axis1DColours[imagePixelString];
 	const axis2D = axis2DColours[imagePixelString];
@@ -188,6 +190,7 @@ PadState.prototype.onPointerDown = function(rgba, pointer, absX, absY) {
 }
 
 PadState.prototype.onPointerMove = function(rgba, pointer, absX, absY) {
+	const rgba = hitboxCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
 	const imagePixelString = rgbaToPixelString(rgba);
 
 	// Find which axis is relevant to where the pointer moved to.

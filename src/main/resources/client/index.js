@@ -93,14 +93,12 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 // React to user interaction.
 //
 hitboxCanvas.onpointerdown = (ev) => {
-	const rgba = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
-	padState.onPointerDown(rgba, ev.pointerId, ev.clientX, ev.clientY);
+	padState.onPointerDown(ev.pointerId, ev.clientX, ev.clientY);
 	sendState();
 };
 
 hitboxCanvas.onpointermove = (ev) => {
-	const rgba = hitboxCanvasImage.getPixels(ev.clientX, ev.clientY, 1, 1).slice(0, 4);
-	padState.onPointerMove(rgba, ev.pointerId, ev.clientX, ev.clientY);
+	padState.onPointerMove(ev.pointerId, ev.clientX, ev.clientY);
 	sendState();
 };
 
