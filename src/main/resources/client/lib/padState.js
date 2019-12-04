@@ -219,9 +219,15 @@ PadState.prototype.updateAxis2D = function(pointer, axis2D, absX, absY) {
 	];
 
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
+	const magnitude = Math.sqrt(relX*relX + relY*relY);
+	const clip = magnitude > 1;
+
+	const clampedX = clip ? (relX / magnitude) : relX;
+	const clampedY = clip ? (relY / magnitude) : relY;
+
 	this.setState({
-		[`${axis2D}X`]: relX,
-		[`${axis2D}Y`]: relY,
+		[`${axis2D}X`]: clampedX,
+		[`${axis2D}Y`]: clampedY,
 	});
 }
 
