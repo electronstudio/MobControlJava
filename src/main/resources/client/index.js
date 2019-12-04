@@ -15,11 +15,9 @@ const UPDATES_PER_SECOND = 60;
 // Get HTML elements.
 //
 const canvasGuide = document.getElementById('canvasGuide');
-
-const hitboxCanvas = document.getElementById('hitboxCanvas');
+const sectionCanvas = document.getElementById('sectionCanvas');
 const graphicCanvas = document.getElementById('graphicCanvas');
 const overlayCanvas = document.getElementById('overlayCanvas');
-const canvases = [hitboxCanvas, graphicCanvas, overlayCanvas];
 
 //
 // Load the images.
@@ -31,18 +29,18 @@ function getImage(imageSrc, onLoad) {
 	return image;
 }
 
-const hitboxImage = getImage('./layout_logical.png', redraw);
-const graphicImage = getImage('./controller.svg', redraw);
+const sectionImage = getImage('./section.png', redraw);
+const graphicImage = getImage('./graphic.svg', redraw);
 
 //
 // Initialise utilities.
 //
-const hitboxCanvasImage = new CanvasImage(hitboxCanvas, hitboxImage);
+const sectionCanvasImage = new CanvasImage(sectionCanvas, sectionImage);
 const graphicCanvasImage = new CanvasImage(graphicCanvas, graphicImage);
 const overlayCanvasImage = new CanvasImage(overlayCanvas, null);
-const canvasImages = [hitboxCanvasImage, graphicCanvasImage, overlayCanvasImage];
+const canvasImages = [sectionCanvasImage, graphicCanvasImage, overlayCanvasImage];
 
-const padState = new PadState(hitboxCanvasImage);
+const padState = new PadState(sectionCanvasImage);
 
 log(UPDATES_PER_SECOND);
 
@@ -110,19 +108,19 @@ setInterval(sendState, 1000 / UPDATES_PER_SECOND);
 //
 // React to user interaction.
 //
-hitboxCanvas.onpointerdown = (ev) => {
+sectionCanvas.onpointerdown = (ev) => {
 	padState.onPointerDown(ev.pointerId, ev.clientX, ev.clientY);
 	redrawOverlay();
 	sendState();
 };
 
-hitboxCanvas.onpointermove = (ev) => {
+sectionCanvas.onpointermove = (ev) => {
 	padState.onPointerMove(ev.pointerId, ev.clientX, ev.clientY);
 	redrawOverlay();
 	sendState();
 };
 
-hitboxCanvas.onpointerup = (ev) => {
+sectionCanvas.onpointerup = (ev) => {
 	padState.onPointerUp(ev.pointerId);
 	redrawOverlay();
 	sendState();

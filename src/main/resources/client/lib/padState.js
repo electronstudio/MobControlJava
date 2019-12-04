@@ -2,7 +2,7 @@
  * PadState
  *
  * Encapsulates the data structure that represents the pad state.
- * Stores a graphic representing coloured hitbox regions for each pad input.
+ * Stores a graphic representing coloured hitbox sections for each pad input.
  * Updates the state based on pointer up/move/down events on the graphic.
  */
 
@@ -70,9 +70,9 @@ function getBoundingBoxRelativePosition(boundingBox, absX, absY) {
 //
 // Contains the state of the pad.
 //
-function PadState(hitboxCanvasImage) {
+function PadState(sectionCanvasImage) {
 	// Underlying image that defines where each button is.
-	this.hitboxCanvasImage = hitboxCanvasImage;
+	this.sectionCanvasImage = sectionCanvasImage;
 
 	// State of the pad.
 	this.buttonState = {};
@@ -96,14 +96,14 @@ PadState.prototype.initAxisBoundingBoxes = function() {
 	for (const pixelString of Object.keys(axis1DColours)) {
 		const axis = axis1DColours[pixelString]
 		const rgba = pixelStringToRgba(pixelString);
-		this.axisBoundingBoxes[axis] = hitboxCanvasImage.getRgbaBoundingBox(rgba);
+		this.axisBoundingBoxes[axis] = sectionCanvasImage.getRgbaBoundingBox(rgba);
 	}
 
 	// Derive and store the bounding boxes of the 2D axis colours.
 	for (const pixelString of Object.keys(axis2DColours)) {
 		const axis = axis2DColours[pixelString]
 		const rgba = pixelStringToRgba(pixelString);
-		this.axisBoundingBoxes[axis] = hitboxCanvasImage.getRgbaBoundingBox(rgba);
+		this.axisBoundingBoxes[axis] = sectionCanvasImage.getRgbaBoundingBox(rgba);
 	}
 }
 
@@ -183,7 +183,7 @@ PadState.prototype.getState = function() {
 // React to pointer down/move/up.
 //
 PadState.prototype.onPointerDown = function(pointer, absX, absY) {
-	const rgba = hitboxCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
+	const rgba = sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
 	const imagePixelString = rgbaToPixelString(rgba);
 
 	// Get associated input.
@@ -212,7 +212,7 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 
 PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 	// Which colour did the pointer move to?
-	const rgba = hitboxCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
+	const rgba = sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
 	const imagePixelString = rgbaToPixelString(rgba);
 
 	// Which input did the pointer move to?
