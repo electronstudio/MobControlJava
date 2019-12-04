@@ -41,8 +41,6 @@ const canvasImages = [sectionCanvasImage, graphicCanvasImage, overlayCanvasImage
 
 const padState = new PadState(sectionCanvasImage);
 
-log(UPDATES_PER_SECOND);
-
 //
 // Redraw.
 //
