@@ -180,11 +180,11 @@ PadState.prototype.updateDirpad = function(pointer, dirpad, absX, absY) {
 	this.dirpadState[`${dirpad}_DOWN`] = relY > +deadZone;
 }
 
-PadState.prototype.updateButton = function(button, activate) {
-	this.buttonState[button] = activate;
+PadState.prototype.updateButton = function(pointer, button, absX, absY) {
+	this.buttonState[button] = true;
 }
 
-PadState.prototype.updateAxis1D = function(axis1D, absX, absY) {
+PadState.prototype.updateAxis1D = function(pointer, axis1D, absX, absY) {
 	const boundingBox = this.colourBoundingBoxes[axis1D];
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 	this.axis1DState[axis1D] = -relY;
@@ -245,8 +245,8 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 
 	// Update state.
 	if (dirpad) { this.updateDirpad(pointer, input, absX, absY); }
-	if (button) { this.updateButton(input, true); }
-	if (axis1D) { this.updateAxis1D(input, absX, absY); }
+	if (button) { this.updateButton(pointer, input, absX, absY); }
+	if (axis1D) { this.updateAxis1D(pointer, input, absX, absY); }
 	if (axis2D) { this.updateAxis2D(pointer, input, absX, absY); }
 }
 
@@ -257,10 +257,10 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 
 	// What is the input type?
 	const isDirpad = dirpads.includes(pointerDownInput);
-	const isInput1D = axis1Ds.includes(pointerDownInput);
-	const isInput2D = axis2Ds.includes(pointerDownInput);
+	const isAxis1D = axis1Ds.includes(pointerDownInput);
+	const isAxis2D = axis2Ds.includes(pointerDownInput);
 
-	const legalMove = isDirpad || isInput1D || isInput2D;
+	const legalMove = isDirpad || isAxis1D || isAxis2D;
 	if (legalMove) {
 		Object.assign(this.activePointerInfoMap[pointer], {
 			movePosition: {
@@ -270,8 +270,8 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 		});
 
 		if (isDirpad) { this.updateDirpad(pointer, pointerDownInput, absX, absY); }
-		if (isInput1D) { this.updateAxis1D(pointerDownInput, absX, absY); }
-		if (isInput2D) { this.updateAxis2D(pointer, pointerDownInput, absX, absY); }
+		if (isAxis1D) { this.updateAxis1D(pointer, pointerDownInput, absX, absY); }
+		if (isAxis2D) { this.updateAxis2D(pointer, pointerDownInput, absX, absY); }
 	}
 }
 
