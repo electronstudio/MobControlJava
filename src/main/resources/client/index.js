@@ -101,11 +101,6 @@ function sendState() {
 }
 
 //
-// Send state at regular intervals.
-//
-setInterval(sendState, 1000 / UPDATES_PER_SECOND);
-
-//
 // React to user interaction.
 //
 sectionCanvas.onpointerdown = (ev) => {
