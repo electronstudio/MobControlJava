@@ -47,8 +47,11 @@ const axis2Ds = Object.values(axis2DColours);
 //
 // RGBA serialisation.
 //
-function pixelStringToRgba(pixelString) {
-	return pixelString.split(',').map((x) => parseInt(x, 10));
+function pixelStringToRgbas(pixelString) {
+	const rgbaStrings = pixelString.split('|');
+	const rgbaStringToRgba = (x) => x.split(',').map((x) => parseInt(x, 10));
+	const rgbas = rgbaStrings.map(rgbaStringToRgba);
+	return rgbas;
 }
 
 function rgbaToPixelString(rgba) {
@@ -95,15 +98,15 @@ PadState.prototype.initAxisBoundingBoxes = function() {
 	// Derive and store the bounding boxes of the 1D axis colours.
 	for (const pixelString of Object.keys(axis1DColours)) {
 		const axis = axis1DColours[pixelString]
-		const rgba = pixelStringToRgba(pixelString);
-		this.axisBoundingBoxes[axis] = sectionCanvasImage.getRgbaBoundingBox(rgba);
+		const rgbas = pixelStringToRgbas(pixelString);
+		this.axisBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 
 	// Derive and store the bounding boxes of the 2D axis colours.
 	for (const pixelString of Object.keys(axis2DColours)) {
 		const axis = axis2DColours[pixelString]
-		const rgba = pixelStringToRgba(pixelString);
-		this.axisBoundingBoxes[axis] = sectionCanvasImage.getRgbaBoundingBox(rgba);
+		const rgbas = pixelStringToRgbas(pixelString);
+		this.axisBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 }
 

@@ -41,10 +41,6 @@ function getRgbasBoundingBox(rgbas, allPixels, width) {
 	return [minX, minY, maxX - minX, maxY - minY];
 }
 
-function getRgbaBoundingBox(rgba, allPixels, width) {
-	return getRgbasBoundingBox([rgba], allPixels, width);
-}
-
 function CanvasImage(canvasElement, image) {
 	this.canvasElement = canvasElement;
 	this.image = image;
@@ -74,8 +70,8 @@ CanvasImage.prototype.getPixels = function(x, y, w, h) {
 	return this.context.getImageData(x || 0, y || 0, w || size.w, h || size.h).data;
 }
 
-CanvasImage.prototype.getRgbaBoundingBox = function(rgba) {
-	return getRgbaBoundingBox(rgba, this.getPixels(), this.getSize().w);
+CanvasImage.prototype.getRgbasBoundingBox = function(rgbas) {
+	return getRgbasBoundingBox(rgbas, this.getPixels(), this.getSize().w);
 }
 
 CanvasImage.prototype.clear = function() {
