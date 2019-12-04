@@ -19,46 +19,29 @@
 		}
 
 		#canvasGuide {
+			position: relative;
 			width: 100%;
 			height: 100vh;
-			position: relative;
-		}
-
-		#hitboxCanvas {
-			display: block;
-			margin: 0;
-			color: white;
-			position: absolute;
-			width: 100%;
-			height: 100%;
 		}
 
 		#hitboxCanvas:focus {
 			outline: none;
 		}
 
-		#graphicCanvas {
-			display: block;
-			margin: 0;
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			pointer-events: none;
-			/* opacity: 30%; */
-		}
-
-		#overlayCanvas {
-			display: block;
-			margin: 0;
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			pointer-events: none;
-			position: absolute;
-		}
-
 		#log {
 			height: 100vh;
+		}
+
+		.canvas {
+			display: block;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+		}
+
+		.passthrough {
+			pointer-events: none;
+			/* opacity: 30%; */
 		}
 	</style>
 
@@ -66,15 +49,16 @@
 	<body>
 		<div id="container">
 			<div id="canvasGuide">
-				<canvas id="hitboxCanvas"></canvas>
-				<canvas id="graphicCanvas"></canvas>
-				<canvas id="overlayCanvas"></canvas>
+				<canvas id="hitboxCanvas" class="canvas"></canvas>
+				<canvas id="graphicCanvas" class="canvas passthrough"></canvas>
+				<canvas id="overlayCanvas" class="canvas passthrough"></canvas>
 			</div>
 			<!-- Uncomment the element below to enable log view -->
-			<textarea id="log"></textarea>
+			<!-- <textarea id="log"></textarea> -->
 		</div>
 	</body>
 </html>
+
 <script type="text/javascript" src="lib/logger.js"></script>
 <script type="text/javascript" src="lib/canvasImage.js"></script>
 <script type="text/javascript" src="lib/padState.js"></script>
