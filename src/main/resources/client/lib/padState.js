@@ -244,31 +244,28 @@ PadState.prototype.getAndResetDeltaState = function() {
 // React to pointer down/move/up.
 //
 PadState.prototype.onPointerDown = function(pointer, absX, absY) {
+	// Get associated input.
 	const rgba = sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
 	const imagePixelString = rgbaToPixelString(rgba);
 
-	// Get associated input.
 	const dirpad = inputColours.dirpad[imagePixelString];
 	const button = inputColours.button[imagePixelString];
 	const axis1D = inputColours.axis1D[imagePixelString];
 	const axis2D = inputColours.axis2D[imagePixelString];
+
 	const input = dirpad || button || axis1D || axis2D;
+	const inputType = getInputTypeFromInputId(input);
 
 	// Update pointer cache.
 	if (input) {
 		this.activePointerInfoMap[pointer] = {
 			input,
-			downPosition: {
-				absX,
-				absY,
-			},
+			downPosition: { absX, absY },
 			extentRadius: axis2D && 200,
 		};
 	}
 
 	// Update state.
-	const inputType = getInputTypeFromInputId(input);
-
 	switch(inputType) {
 		case 'dirpad': { this.updateDirpad(pointer, input, absX, absY); break; }
 		case 'button': { this.updateButton(pointer, input, absX, absY); break; }
@@ -276,43 +273,41 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 		case 'axis2D': { this.updateAxis2D(pointer, input, absX, absY); break; }
 		default: {}
 	}
-}
+};
 
 PadState.prototype.onPointerMove = function(pointer, absX, absY) {
-	// Which input did the pointer start from?
+	// Get associated input.
 	const pointerInfo = this.activePointerInfoMap[pointer];
 	const input = pointerInfo && pointerInfo.input;
-	if (!input) {
-		return;
-	}
-
-	// What is the input type?
 	const inputType = getInputTypeFromInputId(input);
-	const legalMove = ['dirpad', 'axis1D', 'axis2D'].includes(inputType);
-	if (legalMove) {
-		Object.assign(this.activePointerInfoMap[pointer], {
-			movePosition: {
-				absX,
-				absY,
-			},
-		});
 
-		switch(inputType) {
-			case 'dirpad': { this.updateDirpad(pointer, input, absX, absY); break; }
-			case 'axis1D': { this.updateAxis1D(pointer, input, absX, absY); break; }
-			case 'axis2D': { this.updateAxis2D(pointer, input, absX, absY); break; }
-			default: {}
+	if (input) {
+		if (inputType !== 'button') {
+			// Update pointer cache.
+			Object.assign(this.activePointerInfoMap[pointer], {
+				movePosition: { absX, absY },
+			});
+
+			// Update state.
+			switch(inputType) {
+				case 'dirpad': { this.updateDirpad(pointer, input, absX, absY); break; }
+				case 'axis1D': { this.updateAxis1D(pointer, input, absX, absY); break; }
+				case 'axis2D': { this.updateAxis2D(pointer, input, absX, absY); break; }
+				default: {}
+			}
 		}
 	}
-}
+};
 
 PadState.prototype.onPointerUp = function(pointer) {
 	// Get associated input.
 	const input = this.activePointerInfoMap[pointer].input;
-
-	// Update state.
 	const inputType = getInputTypeFromInputId(input);
 
+	// Update pointer cache.
+	delete this.activePointerInfoMap[pointer];
+
+	// Update state.
 	switch(inputType) {
 		case 'dirpad': { this.resetDirpad(input); break; }
 		case 'button': { this.resetButton(input); break; }
@@ -320,7 +315,4 @@ PadState.prototype.onPointerUp = function(pointer) {
 		case 'axis2D': { this.resetAxis2D(input); break; }
 		default: {}
 	}
-
-	// Update pointer cache.
-	delete this.activePointerInfoMap[pointer];
-}
+};
