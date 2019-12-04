@@ -34,7 +34,7 @@ public class WebSocket extends WebSocketAdapter {
     @Override
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
-        System.out.println(controller + " Received TEXT message: " + message);
+        //System.out.println(controller + " Received TEXT message: " + message);
         JsonValue fromJson = new JsonReader().parse(message);
 
         for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++) {

@@ -29,7 +29,19 @@ public class HttpServer {
         server.waitForFinish();
     }
 
-    public HttpServer() throws MalformedURLException, IllegalStateException, URISyntaxException {
+    public HttpServer() throws MalformedURLException, URISyntaxException {
+        this(getDefaultPort());
+    }
+
+    private static int getDefaultPort() {
+        if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+            return 8080;
+        } else {
+            return 80;
+        }
+    }
+
+    public HttpServer(int port) throws MalformedURLException, IllegalStateException, URISyntaxException {
         StdErrLog logger = new StdErrLog();
         logger.setLevel(StdErrLog.LEVEL_INFO);
         Log.setLog(logger);
@@ -61,7 +73,7 @@ public class HttpServer {
 
         server = new Server();
         ServerConnector connector = new ServerConnector(server);
-        connector.setPort(80);
+        connector.setPort(port);
         server.addConnector(connector);
         server.setHandler(handlers);
     }
@@ -80,6 +92,14 @@ public class HttpServer {
     public void waitForFinish() {
         try {
             server.join();
+        } catch (Throwable t) {
+            t.printStackTrace(System.err);
+        }
+    }
+
+    public void stop() {
+        try {
+            server.stop();
         } catch (Throwable t) {
             t.printStackTrace(System.err);
         }

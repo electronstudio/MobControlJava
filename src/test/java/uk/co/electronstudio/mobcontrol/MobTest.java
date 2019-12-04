@@ -50,6 +50,7 @@ public class MobTest {
 
         try {
             controllerManager = new MobControllerManager();
+            controllerManager.start();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {

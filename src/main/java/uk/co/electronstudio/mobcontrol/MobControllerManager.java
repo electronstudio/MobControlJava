@@ -34,6 +34,16 @@ public class MobControllerManager {
         server.start();
     }
 
+    public void start(){
+        server.start();
+        running = true;
+    }
+
+    public void stop(){
+        server.stop();
+        running = false;
+    }
+
 
     /**
      * Call this every frame.  It's not actually necessary for updating the axis and button state
