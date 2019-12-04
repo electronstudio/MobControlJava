@@ -251,16 +251,6 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 }
 
 PadState.prototype.onPointerMove = function(pointer, absX, absY) {
-	// Which colour did the pointer move to?
-	const rgba = sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
-	const imagePixelString = rgbaToPixelString(rgba);
-
-	// Which input did the pointer move to?
-	const dirpad = dirpadColours[imagePixelString];
-	const axis1D = axis1DColours[imagePixelString];
-	const axis2D = axis2DColours[imagePixelString];
-	const pointerMoveInput = dirpad || axis1D || axis2D;
-
 	// Which input did the pointer start from?
 	const pointerInfo = this.activePointerInfoMap[pointer];
 	const pointerDownInput = pointerInfo && pointerInfo.input;
@@ -269,9 +259,8 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 	const isDirpad = dirpads.includes(pointerDownInput);
 	const isInput1D = axis1Ds.includes(pointerDownInput);
 	const isInput2D = axis2Ds.includes(pointerDownInput);
-	const pointerStayedInBoundary = pointerMoveInput === pointerDownInput;
 
-	const legalMove = isDirpad || (isInput1D && pointerStayedInBoundary) || isInput2D;
+	const legalMove = isDirpad || isInput1D || isInput2D;
 	if (legalMove) {
 		Object.assign(this.activePointerInfoMap[pointer], {
 			movePosition: {
