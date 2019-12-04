@@ -79,8 +79,8 @@ function PadState(hitboxCanvasImage) {
 	this.axis1DState = {};
 	this.axis2DState = {};
 
-	// Cache of active pointers to associated input.
-	this.pointerToPointerDownInput = {};
+	// Cache of active pointers to associated info.
+	this.activePointerInfoMap = {};
 
 	// Cache of bounding boxes for axis-inputs.
 	this.axisBoundingBoxes = {};
@@ -112,6 +112,10 @@ PadState.prototype.initAxisBoundingBoxes = function() {
 //
 PadState.prototype.getAxisBoundingBoxes = function() {
 	return Object.values(this.axisBoundingBoxes);
+}
+
+PadState.prototype.getActivePointerInfos = function() {
+	return Object.values(this.activePointerInfoMap);
 }
 
 //
@@ -186,10 +190,18 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 	if (axis2D) { this.updateAxis2D(input, absX, absY); }
 
 	// Update pointer cache.
-	if (input) { this.pointerToPointerDownInput[pointer] = input; }
+	if (input) {
+		this.activePointerInfoMap[pointer] = {
+			input,
+			downPosition: {
+				absX,
+				absY,
+			},
+		};
+	}
 }
 
-PadState.prototype.onPointerMove = function(rgba, pointer, absX, absY) {
+PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 	const rgba = hitboxCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
 	const imagePixelString = rgbaToPixelString(rgba);
 
@@ -200,7 +212,8 @@ PadState.prototype.onPointerMove = function(rgba, pointer, absX, absY) {
 
 	// If an axis was relevant...
 	if (pointerMoveAxis) {
-		const pointerDownInput = this.pointerToPointerDownInput[pointer];
+		const pointerInfo = this.activePointerInfoMap[pointer];
+		const pointerDownInput = pointerInfo && pointerInfo.input;
 
 		// If the move is still within the boundary of the initial interaction...
 		if (pointerMoveAxis === pointerDownInput) {
@@ -217,7 +230,7 @@ PadState.prototype.onPointerMove = function(rgba, pointer, absX, absY) {
 
 PadState.prototype.onPointerUp = function(pointer) {
 	// Get associated input.
-	const pointerDownInput = this.pointerToPointerDownInput[pointer];
+	const pointerDownInput = this.activePointerInfoMap[pointer].input;
 
 	// Update state.
 	if (buttons.includes(pointerDownInput)) { this.resetButton(pointerDownInput); }
@@ -225,5 +238,5 @@ PadState.prototype.onPointerUp = function(pointer) {
 	if (axis2Ds.includes(pointerDownInput)) { this.resetAxis2D(pointerDownInput); }
 
 	// Update pointer cache.
-	delete this.pointerToPointerDownInput[pointer];
+	delete this.activePointerInfoMap[pointer];
 }
