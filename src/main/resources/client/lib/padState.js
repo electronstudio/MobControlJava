@@ -93,8 +93,8 @@ function PadState(sectionCanvasImage) {
 	// Cache of active pointers to associated info.
 	this.activePointerInfoMap = {};
 
-	// Cache of bounding boxes for axis-inputs.
-	this.axisBoundingBoxes = {};
+	// Cache of bounding boxes for move-enabled inputs.
+	this.colourBoundingBoxes = {};
 
 	this.resetState();
 }
@@ -107,21 +107,21 @@ PadState.prototype.initAxisBoundingBoxes = function() {
 	for (const pixelString of Object.keys(dirpadColours)) {
 		const dirpad = dirpadColours[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
-		this.axisBoundingBoxes[dirpad] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
+		this.colourBoundingBoxes[dirpad] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 
 	// Derive and store the bounding boxes of the 1D axis colours.
 	for (const pixelString of Object.keys(axis1DColours)) {
 		const axis = axis1DColours[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
-		this.axisBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
+		this.colourBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 
 	// Derive and store the bounding boxes of the 2D axis colours.
 	for (const pixelString of Object.keys(axis2DColours)) {
 		const axis = axis2DColours[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
-		this.axisBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
+		this.colourBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 }
 
@@ -129,7 +129,7 @@ PadState.prototype.initAxisBoundingBoxes = function() {
 // Bounding box get.
 //
 PadState.prototype.getAxisBoundingBoxes = function() {
-	return Object.values(this.axisBoundingBoxes);
+	return Object.values(this.colourBoundingBoxes);
 }
 
 PadState.prototype.getActivePointerInfos = function() {
@@ -170,7 +170,7 @@ PadState.prototype.resetState = function() {
 // State update.
 //
 PadState.prototype.updateDirpad = function(pointer, dirpad, absX, absY) {
-	const boundingBox = this.axisBoundingBoxes[dirpad];
+	const boundingBox = this.colourBoundingBoxes[dirpad];
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 
 	const deadZone = 0.3;
@@ -185,7 +185,7 @@ PadState.prototype.updateButton = function(button, activate) {
 }
 
 PadState.prototype.updateAxis1D = function(axis1D, absX, absY) {
-	const boundingBox = this.axisBoundingBoxes[axis1D];
+	const boundingBox = this.colourBoundingBoxes[axis1D];
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 	this.axis1DState[axis1D] = -relY;
 }
