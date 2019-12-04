@@ -153,8 +153,16 @@ PadState.prototype.updateAxis1D = function(axis1D, absX, absY) {
 	this.axis1DState[axis1D] = -relY;
 }
 
-PadState.prototype.updateAxis2D = function(axis2D, absX, absY) {
-	const boundingBox = this.axisBoundingBoxes[axis2D];
+PadState.prototype.updateAxis2D = function(pointer, axis2D, absX, absY) {
+	const { downPosition, extentRadius } = this.activePointerInfoMap[pointer];
+
+	const boundingBox = [
+		downPosition.absX - extentRadius,
+		downPosition.absY - extentRadius,
+		extentRadius * 2,
+		extentRadius * 2,
+	];
+
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 	this.axis2DState[`${axis2D}X`] = relX;
 	this.axis2DState[`${axis2D}Y`] = -relY;
@@ -184,11 +192,6 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 	const axis2D = axis2DColours[imagePixelString];
 	const input = button || axis1D || axis2D;
 
-	// Update state.
-	if (button) { this.updateButton(input, true); }
-	if (axis1D) { this.updateAxis1D(input, absX, absY); }
-	if (axis2D) { this.updateAxis2D(input, absX, absY); }
-
 	// Update pointer cache.
 	if (input) {
 		this.activePointerInfoMap[pointer] = {
@@ -197,8 +200,14 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 				absX,
 				absY,
 			},
+			extentRadius: 200,
 		};
 	}
+
+	// Update state.
+	if (button) { this.updateButton(input, true); }
+	if (axis1D) { this.updateAxis1D(input, absX, absY); }
+	if (axis2D) { this.updateAxis2D(pointer, input, absX, absY); }
 }
 
 PadState.prototype.onPointerMove = function(pointer, absX, absY) {
@@ -222,7 +231,7 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 			// If there have an associated bounding box... (no reason why there shouldn't be)
 			if (boundingBox) {
 				if (axis1D) { this.updateAxis1D(axis1D, absX, absY); }
-				if (axis2D) { this.updateAxis2D(axis2D, absX, absY); }
+				if (axis2D) { this.updateAxis2D(pointer, axis2D, absX, absY); }
 
 				Object.assign(this.activePointerInfoMap[pointer], {
 					movePosition: {
