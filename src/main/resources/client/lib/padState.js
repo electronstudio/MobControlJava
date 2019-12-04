@@ -281,13 +281,13 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 	// Which input did the pointer start from?
 	const pointerInfo = this.activePointerInfoMap[pointer];
-	const pointerDownInput = pointerInfo && pointerInfo.input;
-	if (!pointerDownInput) {
+	const input = pointerInfo && pointerInfo.input;
+	if (!input) {
 		return;
 	}
 
 	// What is the input type?
-	const inputType = getInputTypeFromInputId(pointerDownInput);
+	const inputType = getInputTypeFromInputId(input);
 	const legalMove = ['dirpad', 'axis1D', 'axis2D'].includes(inputType);
 	if (legalMove) {
 		Object.assign(this.activePointerInfoMap[pointer], {
@@ -298,9 +298,9 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 		});
 
 		switch(inputType) {
-			case 'dirpad': { this.updateDirpad(pointer, pointerDownInput, absX, absY); break; }
-			case 'axis1D': { this.updateAxis1D(pointer, pointerDownInput, absX, absY); break; }
-			case 'axis2D': { this.updateAxis2D(pointer, pointerDownInput, absX, absY); break; }
+			case 'dirpad': { this.updateDirpad(pointer, input, absX, absY); break; }
+			case 'axis1D': { this.updateAxis1D(pointer, input, absX, absY); break; }
+			case 'axis2D': { this.updateAxis2D(pointer, input, absX, absY); break; }
 			default: {}
 		}
 	}
@@ -308,16 +308,16 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 
 PadState.prototype.onPointerUp = function(pointer) {
 	// Get associated input.
-	const pointerDownInput = this.activePointerInfoMap[pointer].input;
+	const input = this.activePointerInfoMap[pointer].input;
 
 	// Update state.
-	const inputType = getInputTypeFromInputId(pointerDownInput);
+	const inputType = getInputTypeFromInputId(input);
 
 	switch(inputType) {
-		case 'dirpad': { this.resetDirpad(pointerDownInput); break; }
-		case 'button': { this.resetButton(pointerDownInput); break; }
-		case 'axis1D': { this.resetAxis1D(pointerDownInput); break; }
-		case 'axis2D': { this.resetAxis2D(pointerDownInput); break; }
+		case 'dirpad': { this.resetDirpad(input); break; }
+		case 'button': { this.resetButton(input); break; }
+		case 'axis1D': { this.resetAxis1D(input); break; }
+		case 'axis2D': { this.resetAxis2D(input); break; }
 		default: {}
 	}
 
