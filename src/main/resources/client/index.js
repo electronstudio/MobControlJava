@@ -15,14 +15,34 @@ const UPDATES_PER_SECOND = 60;
 // Get HTML elements.
 //
 const canvasGuide = document.getElementById('canvasGuide');
+
 const hitboxCanvas = document.getElementById('hitboxCanvas');
+const graphicCanvas = document.getElementById('graphicCanvas');
 const overlayCanvas = document.getElementById('overlayCanvas');
+const canvases = [hitboxCanvas, graphicCanvas, overlayCanvas];
+
+//
+// Load the images.
+//
+function getImage(imageSrc, onLoad) {
+	const image = new Image;
+	image.addEventListener('load', onLoad, false);
+	image.src = imageSrc;
+	return image;
+}
+
+const hitboxImage = getImage('./layout_logical.png', redraw);
+const graphicImage = getImage('./controller.svg', redraw);
 
 //
 // Initialise utilities.
 //
-const hitboxCanvasImage = new CanvasImage(hitboxCanvas);
+const hitboxCanvasImage = new CanvasImage(hitboxCanvas, hitboxImage);
+const graphicCanvasImage = new CanvasImage(graphicCanvas, graphicImage);
+const canvasImages = [hitboxCanvasImage, graphicCanvasImage];
+
 const padState = new PadState(hitboxCanvasImage);
+
 log(UPDATES_PER_SECOND);
 
 //
@@ -30,13 +50,15 @@ log(UPDATES_PER_SECOND);
 //
 function redraw() {
 	// Align canvas elements with the canvas guide.
-	hitboxCanvas.width = canvasGuide.scrollWidth;
-	hitboxCanvas.height = canvasGuide.scrollHeight;
-	overlayCanvas.width = canvasGuide.scrollWidth;
-	overlayCanvas.height = canvasGuide.scrollHeight;
+	canvases.forEach(canvas => {
+		canvas.width = canvasGuide.scrollWidth;
+		canvas.height = canvasGuide.scrollHeight;
+	});
 
-	// Draw the image.
-	hitboxCanvasImage.drawImage(hitboxImage);
+	// Draw images.
+	canvasImages.forEach(canvasImage => {
+		canvasImage.drawImage();
+	});
 
 	// Initialise bounding boxes based on what we've drawn.
 	padState.initAxisBoundingBoxes();
@@ -48,15 +70,6 @@ function redraw() {
 		hitboxCanvasImage.context.strokeRect(...boundingBox);
 	});
 }
-
-//
-// Load the image.
-//
-const hitboxImage = new Image;
-hitboxImage.addEventListener('load', function() {
-	redraw();
-}, false);
-hitboxImage.src = './layout_logical.png';
 
 window.addEventListener('resize', function() {
 	redraw();

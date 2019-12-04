@@ -33,8 +33,9 @@ function getRgbaBoundingBox(rgba, allPixels, width) {
 	return [minX, minY, maxX - minX, maxY - minY];
 }
 
-function CanvasImage(canvasElement) {
+function CanvasImage(canvasElement, image) {
 	this.canvasElement = canvasElement;
+	this.image = image;
 	this.context = canvasElement.getContext('2d');
 }
 
@@ -47,7 +48,7 @@ CanvasImage.prototype.getSize = function() {
 
 CanvasImage.prototype.drawImage = function(image) {
 	const size = this.getSize();
-	this.context.drawImage(hitboxImage, 0, 0, size.w, size.h);
+	this.context.drawImage(this.image, 0, 0, size.w, size.h);
 }
 
 CanvasImage.prototype.getPixels = function(x, y, w, h) {

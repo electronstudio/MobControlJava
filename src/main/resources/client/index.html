@@ -37,6 +37,16 @@
 			outline: none;
 		}
 
+		#graphicCanvas {
+			display: block;
+			margin: 0;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			/* opacity: 30%; */
+		}
+
 		#overlayCanvas {
 			display: block;
 			margin: 0;
@@ -44,9 +54,10 @@
 			width: 100%;
 			height: 100%;
 			pointer-events: none;
+			position: absolute;
 		}
 
-		textarea {
+		#log {
 			height: 100vh;
 		}
 	</style>
@@ -56,6 +67,7 @@
 		<div id="container">
 			<div id="canvasGuide">
 				<canvas id="hitboxCanvas"></canvas>
+				<canvas id="graphicCanvas"></canvas>
 				<canvas id="overlayCanvas"></canvas>
 			</div>
 			<!-- Uncomment the element below to enable log view -->
