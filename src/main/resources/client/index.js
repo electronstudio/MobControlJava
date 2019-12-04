@@ -9,7 +9,6 @@
 // Configuration.
 //
 const ADDRESS = `${new URL(window.location.href).hostname}/mobcontrol/`;
-const UPDATES_PER_SECOND = 60;
 
 //
 // Get HTML elements.
@@ -95,9 +94,15 @@ window.addEventListener('resize', function() {
 // State transmission.
 //
 const socket = new WebSocket(`ws://${ADDRESS}`);
+let lastPayload = null;
+
 function sendState() {
-	const state = padState.getState();
-	socket.send(JSON.stringify(state, null, 4));
+	const deltaState = padState.getAndResetDeltaState();
+	const thisPayload = JSON.stringify(deltaState, null, 4);
+	if (lastPayload !== thisPayload) {
+		lastPayload = thisPayload;
+		socket.send(thisPayload);
+	}
 }
 
 //
