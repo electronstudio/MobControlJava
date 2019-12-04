@@ -211,36 +211,35 @@ PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 }
 
 PadState.prototype.onPointerMove = function(pointer, absX, absY) {
+	// Which colour did the pointer move to?
 	const rgba = hitboxCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
 	const imagePixelString = rgbaToPixelString(rgba);
 
-	// Find which axis is relevant to where the pointer moved to.
+	// Which input did the pointer move to?
 	const axis1D = axis1DColours[imagePixelString];
 	const axis2D = axis2DColours[imagePixelString];
-	const pointerMoveAxis = axis1D || axis2D;
+	const pointerMoveInput = axis1D || axis2D;
 
-	// If an axis was relevant...
-	if (pointerMoveAxis) {
-		const pointerInfo = this.activePointerInfoMap[pointer];
-		const pointerDownInput = pointerInfo && pointerInfo.input;
+	// Which input did the pointer start from?
+	const pointerInfo = this.activePointerInfoMap[pointer];
+	const pointerDownInput = pointerInfo && pointerInfo.input;
 
-		// If the move is still within the boundary of the initial interaction...
-		if (pointerMoveAxis === pointerDownInput) {
-			const boundingBox = this.axisBoundingBoxes[pointerMoveAxis];
+	// What is the input type?
+	const isInput1D = axis1Ds.includes(pointerDownInput);
+	const isInput2D = axis2Ds.includes(pointerDownInput);
+	const pointerStayedInBoundary = pointerMoveInput === pointerDownInput;
 
-			// If there have an associated bounding box... (no reason why there shouldn't be)
-			if (boundingBox) {
-				if (axis1D) { this.updateAxis1D(axis1D, absX, absY); }
-				if (axis2D) { this.updateAxis2D(pointer, axis2D, absX, absY); }
+	const legalMove = (isInput1D && pointerStayedInBoundary) || isInput2D;
+	if (legalMove) {
+		Object.assign(this.activePointerInfoMap[pointer], {
+			movePosition: {
+				absX,
+				absY,
+			},
+		});
 
-				Object.assign(this.activePointerInfoMap[pointer], {
-					movePosition: {
-						absX,
-						absY,
-					},
-				});
-			}
-		}
+		if (isInput1D) { this.updateAxis1D(pointerDownInput, absX, absY); }
+		if (isInput2D) { this.updateAxis2D(pointer, pointerDownInput, absX, absY); }
 	}
 }
 
