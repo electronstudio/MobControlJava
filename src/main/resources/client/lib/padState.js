@@ -189,7 +189,7 @@ PadState.prototype.updateButton = function(pointer, button, absX, absY) {
 PadState.prototype.updateAxis1D = function(pointer, axis1D, absX, absY) {
 	const boundingBox = this.colourBoundingBoxes[axis1D];
 	const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
-	this.axis1DState[axis1D] = -relY;
+	this.axis1DState[axis1D] = (-relY / 2) + 0.5;
 }
 
 PadState.prototype.updateAxis2D = function(pointer, axis2D, absX, absY) {
