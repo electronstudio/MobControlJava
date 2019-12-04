@@ -8,7 +8,7 @@
 //
 // Utility to derive bounding box of a single colour.
 //
-function getRgbaBoundingBox(rgba, allPixels, width) {
+function getRgbasBoundingBox(rgbas, allPixels, width) {
 	let minX, minY, maxX, maxY = undefined;
 
 	for (var i=0; i<allPixels.length; i+=4) {
@@ -16,11 +16,19 @@ function getRgbaBoundingBox(rgba, allPixels, width) {
 		const pixelX = pixelIndex % width;
 		const pixelY = Math.floor(pixelIndex / width);
 
-		const colourMatches = true
-			&& rgba[0] === allPixels[i+0]
-			&& rgba[1] === allPixels[i+1]
-			&& rgba[2] === allPixels[i+2]
-			&& rgba[3] === allPixels[i+3];
+		let colourMatches = false;
+
+		rgbas.forEach(rgba => {
+			const match = true
+				&& rgba[0] === allPixels[i+0]
+				&& rgba[1] === allPixels[i+1]
+				&& rgba[2] === allPixels[i+2]
+				&& rgba[3] === allPixels[i+3];
+
+			if (match) {
+				colourMatches = true;
+			}
+		})
 
 		if (colourMatches) {
 			if (minX === undefined || pixelX < minX) { minX = pixelX; }
@@ -31,6 +39,10 @@ function getRgbaBoundingBox(rgba, allPixels, width) {
 	}
 
 	return [minX, minY, maxX - minX, maxY - minY];
+}
+
+function getRgbaBoundingBox(rgba, allPixels, width) {
+	return getRgbasBoundingBox([rgba], allPixels, width);
 }
 
 function CanvasImage(canvasElement, image) {
