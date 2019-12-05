@@ -301,7 +301,8 @@ PadState.prototype.onPointerMove = function(pointer, absX, absY) {
 
 PadState.prototype.onPointerUp = function(pointer) {
 	// Get associated input.
-	const input = this.activePointerInfoMap[pointer].input;
+	const pointerInfo = this.activePointerInfoMap[pointer];
+	const input = pointerInfo && pointerInfo.input;
 	const inputType = getInputTypeFromInputId(input);
 
 	// Update pointer cache.
