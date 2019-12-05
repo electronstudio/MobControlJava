@@ -65,7 +65,7 @@ public class WebSocket extends WebSocketAdapter {
     }
 
     public void sendRumble(float leftMagnitude, float rightMagnitude, int duration_ms){
-        String json = "{ \"header\": \"vibrate\", \"data\": {\" mag_left\": "+leftMagnitude+", \"mag_right\": "+rightMagnitude+", \"duration_ms\": "+duration_ms+" } }";
+        String json = "{ \"header\": \"vibrate\", \"data\": { \"mag_left\": "+leftMagnitude+", \"mag_right\": "+rightMagnitude+", \"duration_ms\": "+duration_ms+" } }";
         System.out.println(json);
         try {
             getRemote().sendString(json);
