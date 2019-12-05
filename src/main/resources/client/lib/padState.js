@@ -10,6 +10,8 @@
 // Expected colours, for each input type.
 //
 
+const AXIS2D_EXTENT_RADIUS = 20;
+
 const inputColours = {
 	dirpad: {
 		// Redundant info but it makes the lookup much easier.
@@ -261,7 +263,7 @@ PadState.prototype.onPointerDown = function onPointerDown(pointer, absX, absY) {
 		this.activePointerInfoMap[pointer] = {
 			input,
 			downPosition: { absX, absY },
-			extentRadius: axis2D && 200,
+			extentRadius: axis2D && AXIS2D_EXTENT_RADIUS,
 		};
 	}
 
