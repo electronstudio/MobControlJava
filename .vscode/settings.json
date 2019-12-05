@@ -1,0 +1,8 @@
+{
+	"eslint.lintTask.enable": true,
+	"eslint.alwaysShowStatus": true,
+	"eslint.validate": [ "javascript", "html" ],
+	"files.exclude": {
+		"**/node_modules/": true
+	}
+}
