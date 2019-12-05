@@ -89,14 +89,27 @@ window.addEventListener('resize', function() {
 })
 
 //
+// Vibration.
+//
+navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+if ('vibrate' in navigator) {
+	log('Vibration API supported');
+}
+
+function vibrate1(data) {
+	const result = navigator.vibrate(data.duration_ms);
+	log('Vibration 1 result:', result, data.duration_ms / 1000);
+}
+
+function vibrate2() {
+	const result = navigator.vibrate([100,30,100,30,100,30,200,30,200,30,200,30,100,30,100,30,100]);
+	log('Vibration 2 result:', result);
+}
+
+//
 // State transmission.
 //
 const socket = new WebSocket(`ws://${ADDRESS}`);
-
-socket.onclose    = event => { console.log('onclose',   event); log('onclose',   event); }
-socket.onerror    = event => { console.log('onerror',   event); log('onerror',   event); };
-socket.onmessage  = event => { console.log('onmessage', event); log('onmessage', event); };
-socket.onopen     = event => { console.log('onopen',    event); log('onopen',    event); };
 
 let lastPayload = null;
 
@@ -107,7 +120,21 @@ function sendState() {
 		lastPayload = thisPayload;
 		socket.send(thisPayload);
 	}
+
+	if (deltaState.BUTTON_GUIDE) { vibrate1({ duration_ms: 1234 }); }
+	if (deltaState.BUTTON_BACK) { vibrate2(); }
 }
+
+//
+// Receive messages.
+//
+socket.onmessage  = event => {
+	const { header, data } = JSON.parse(event.data);
+	switch(header) {
+		case "vibrate": { vibrate1(data); }
+		default: {}
+	}
+};
 
 //
 // React to user interaction.
