@@ -92,6 +92,12 @@ window.addEventListener('resize', function() {
 // State transmission.
 //
 const socket = new WebSocket(`ws://${ADDRESS}`);
+
+socket.onclose    = event => { console.log('onclose',   event); log('onclose',   event); }
+socket.onerror    = event => { console.log('onerror',   event); log('onerror',   event); };
+socket.onmessage  = event => { console.log('onmessage', event); log('onmessage', event); };
+socket.onopen     = event => { console.log('onopen',    event); log('onopen',    event); };
+
 let lastPayload = null;
 
 function sendState() {
