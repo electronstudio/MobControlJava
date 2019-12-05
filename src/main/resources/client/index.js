@@ -26,7 +26,7 @@ const overlayCanvas = document.getElementById('overlayCanvas');
 // Load the images.
 //
 function getImage(imageSrc, onLoad) {
-	const image = new Image;
+	const image = new Image();
 	image.addEventListener('load', onLoad, false);
 	image.src = imageSrc;
 	return image;
@@ -49,7 +49,7 @@ const padState = new PadState(sectionCanvasImage);
 // Redraw.
 //
 function redrawBase() {
-	canvasImages.forEach(canvasImage => {
+	canvasImages.forEach((canvasImage) => {
 		canvasImage.alignWithElement(canvasGuide);
 		canvasImage.drawImage();
 	});
@@ -59,14 +59,14 @@ function redrawBase() {
 }
 
 function redrawOverlay() {
-	// Draw internal state on the overlay for visual verification that the code is doing what it should be doing.
+	// Draw visual verification.
 	overlayCanvasImage.clear();
 
 	padState.getAxisBoundingBoxes().forEach((boundingBox) => {
 		overlayCanvasImage.drawBoundingBox(boundingBox);
 	});
 
-	padState.getActivePointerInfos().forEach(pointerInfo => {
+	padState.getActivePointerInfos().forEach((pointerInfo) => {
 		const { downPosition, movePosition, extentRadius } = pointerInfo;
 		const fillStyle = 'rgba(0,0,0,0.1)';
 		const strokeStyle = 'rgba(0,0,0,0.3)';
@@ -88,9 +88,9 @@ function redraw() {
 	redrawOverlay();
 }
 
-window.addEventListener('resize', function() {
+window.addEventListener('resize', () => {
 	redraw();
-})
+});
 
 //
 // Vibration.
@@ -106,7 +106,7 @@ function vibrate1(data) {
 }
 
 function vibrate2() {
-	const result = navigator.vibrate([100,30,100,30,100,30,200,30,200,30,200,30,100,30,100,30,100]);
+	const result = navigator.vibrate([100, 30, 100, 30, 100, 30, 200, 30, 200, 30, 200, 30, 100, 30, 100, 30, 100]);
 	log('Vibration 2 result:', result);
 }
 
@@ -132,11 +132,11 @@ function sendState() {
 //
 // Receive messages.
 //
-socket.onmessage  = event => {
+socket.onmessage = (event) => {
 	const { header, data } = JSON.parse(event.data);
-	switch(header) {
-		case "vibrate": { vibrate1(data); }
-		default: {}
+	switch (header) {
+	case 'vibrate': { vibrate1(data); break; }
+	default: { break; }
 	}
 };
 
