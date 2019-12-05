@@ -82,7 +82,7 @@ function getBoundingBoxRelativePosition(boundingBox, absX, absY) {
 //
 // Contains the state of the pad.
 //
-function PadState(sectionCanvasImage) {
+export default function PadState(sectionCanvasImage) {
 	// Underlying image that defines where each button is.
 	this.sectionCanvasImage = sectionCanvasImage;
 
@@ -111,21 +111,21 @@ PadState.prototype.initAxisBoundingBoxes = function() {
 	for (const pixelString of Object.keys(inputColours.dirpad)) {
 		const dirpad = inputColours.dirpad[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
-		this.colourBoundingBoxes[dirpad] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
+		this.colourBoundingBoxes[dirpad] = this.sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 
 	// Derive and store the bounding boxes of the 1D axis colours.
 	for (const pixelString of Object.keys(inputColours.axis1D)) {
 		const axis = inputColours.axis1D[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
-		this.colourBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
+		this.colourBoundingBoxes[axis] = this.sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 
 	// Derive and store the bounding boxes of the 2D axis colours.
 	for (const pixelString of Object.keys(inputColours.axis2D)) {
 		const axis = inputColours.axis2D[pixelString]
 		const rgbas = pixelStringToRgbas(pixelString);
-		this.colourBoundingBoxes[axis] = sectionCanvasImage.getRgbasBoundingBox(rgbas);
+		this.colourBoundingBoxes[axis] = this.sectionCanvasImage.getRgbasBoundingBox(rgbas);
 	}
 }
 
@@ -245,7 +245,7 @@ PadState.prototype.getAndResetDeltaState = function() {
 //
 PadState.prototype.onPointerDown = function(pointer, absX, absY) {
 	// Get associated input.
-	const rgba = sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
+	const rgba = this.sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
 	const imagePixelString = rgbaToPixelString(rgba);
 
 	const dirpad = inputColours.dirpad[imagePixelString];

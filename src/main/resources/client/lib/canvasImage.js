@@ -41,7 +41,7 @@ function getRgbasBoundingBox(rgbas, allPixels, width) {
 	return [minX, minY, maxX - minX, maxY - minY];
 }
 
-function CanvasImage(canvasElement, image) {
+export default function CanvasImage(canvasElement, image) {
 	this.canvasElement = canvasElement;
 	this.image = image;
 	this.context = canvasElement.getContext('2d');

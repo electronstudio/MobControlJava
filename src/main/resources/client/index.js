@@ -5,6 +5,10 @@
  * Transmits internal representation to server on regular intervals.
  */
 
+import CanvasImage from './lib/canvasImage.js';
+import PadState from './lib/padState.js';
+import log from './lib/logger.js';
+
 //
 // Configuration.
 //

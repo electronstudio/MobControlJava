@@ -22,3 +22,5 @@ Logger.prototype.log = function (...tokens) {
 
 const logger = new Logger(logElement);
 const log = logger.log.bind(logger);
+
+export default log;
