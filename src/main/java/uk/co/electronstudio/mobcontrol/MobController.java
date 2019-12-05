@@ -226,7 +226,8 @@ public class MobController implements RumbleController {
      * @return Whether or not the controller was able to be vibrated (i.e. if rumble is supported)
      */
     public boolean rumble(float leftMagnitude, float rightMagnitude, int duration_ms) {
-        return false;
+        webSocket.sendRumble(leftMagnitude, rightMagnitude, duration_ms);
+        return true;
     }
 
     public static String getButtonName(int i) {

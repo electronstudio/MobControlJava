@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import static uk.co.electronstudio.mobcontrol.MobController.*;
@@ -61,5 +62,17 @@ public class WebSocket extends WebSocketAdapter {
     public void onWebSocketError(Throwable cause) {
         super.onWebSocketError(cause);
         cause.printStackTrace(System.err);
+    }
+
+    public void sendRumble(float leftMagnitude, float rightMagnitude, int duration_ms){
+        String json = "{ \"header\": \"vibrate\", \"data\": {\" mag_left\": "+leftMagnitude+", \"mag_right\": "+rightMagnitude+", \"duration_ms\": "+duration_ms+" } }";
+        System.out.println(json);
+        try {
+            getRemote().sendString(json);
+            getRemote().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
