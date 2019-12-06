@@ -17,7 +17,8 @@ plugins {
 apply plugin: 'com.jfrog.bintray'
 
 group 'uk.co.electronstudio.mobcontrol'
-version '1.0-SNAPSHOT'
+version '0.1.1'
+ext.ver = version
 project.ext.mainClassName = "uk.co.electronstudio.mobcontrol.MobTest"
 
 sourceCompatibility = 1.8
@@ -60,3 +61,101 @@ task uberjar(dependsOn: classes, type: Jar) {
 
     }
 }
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+javadoc {
+    exclude 'com/studiohartman/jamepad/**'
+    exclude 'com/badlogic/**'
+    destinationDir = new File('docs')
+    //options.overview = "overview.html"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "GPLv3 with Classpath Exception"
+            url "https://www.gnu.org/software/classpath/license.html"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "electronstudio"
+            name "Electron Studio"
+            email "support@electronstudio.co.uk"
+        }
+    }
+
+    scm {
+        url "https://github.com/electronstudio/"
+    }
+}
+
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar {
+                classifier "sources"
+            }
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+            groupId 'uk.co.electronstudio.mobcontrol'
+            artifactId 'mobcontrol'
+            version ver
+
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Use mobile devices as game controllers')
+                root.appendNode('name', 'MobControlJava')
+                root.appendNode('url', 'https://github.com/electronstudio/MobControlJava')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+    publish.dependsOn jar, sourcesJar, javadocJar//, generatePomFileForMavenPublicationPublication
+}
+
+String keyString = ''
+File file = new File(System.getProperty("user.home")+"/bintray.key")
+if(file.exists()){
+    keyString = file.text.trim()
+}
+
+bintray {
+    user = 'electronstudio' //System.getenv('BINTRAY_USER')
+    key = keyString //System.getenv('BINTRAY_KEY')
+    publications = ['mavenPublication']
+    publish = true
+    override = true
+    pkg {
+        repo = 'MobControlJava'
+        name = 'MobControlJava'
+        userOrg = 'electronstudio'
+        licenses = ["GPL-2.0+CE"]
+        vcsUrl = 'https://github.com/electronstudio/MobControlJava.git'
+        version {
+            name = ver
+            desc = ver
+            released  = new Date()
+            vcsTag = ver
+        }
+    }
+}
+
+bintrayUpload.dependsOn publish
