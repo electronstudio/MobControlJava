@@ -16,6 +16,24 @@ Java 1.8+
 ./gradlew run
 ```
 
+## Use in your project
+
+```diff
+buildscript{
+    repositories {
++        jcenter()
+    }
+```
+
+
+```diff
+    dependencies {
++       compile "uk.co.electronstudio.mobcontrol:mobcontrol:0.1.+"
+    }
+}
+```
+
+
 ## License
 
 sdl2gdx is distributed under GPL+Classpath license, the same as OpenJDK itself, so you will have no
