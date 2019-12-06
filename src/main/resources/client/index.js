@@ -7,7 +7,7 @@
 
 import CanvasImage from './lib/canvasImage.js';
 import PadState from './lib/padState.js';
-import log from './lib/logger.js';
+import Logger from './lib/logger.js';
 
 //
 // Configuration.
@@ -23,6 +23,7 @@ function getAddress() {
 //
 // Get HTML elements.
 //
+const logElement = document.getElementById('log');
 const canvasGuide = document.getElementById('canvasGuide');
 const sectionCanvas = document.getElementById('sectionCanvas');
 const graphicCanvas = document.getElementById('graphicCanvas');
@@ -44,6 +45,7 @@ const graphicImage = getImage('./pads/1/graphic.svg', redraw);
 //
 // Initialise utilities.
 //
+const logger = new Logger(logElement);
 const sectionCanvasImage = new CanvasImage(sectionCanvas, sectionImage);
 const graphicCanvasImage = new CanvasImage(graphicCanvas, graphicImage);
 const overlayCanvasImage = new CanvasImage(overlayCanvas, null);
@@ -110,17 +112,17 @@ window.addEventListener('resize', () => {
 //
 navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
 if ('vibrate' in navigator) {
-	log('Vibration API supported');
+	logger.log('Vibration API supported');
 }
 
 function vibrate1(data) {
 	const result = navigator.vibrate(data.duration_ms);
-	log('Vibration 1 result:', result, data.duration_ms / 1000);
+	logger.log('Vibration 1 result:', result, data.duration_ms / 1000);
 }
 
 function vibrate2() {
 	const result = navigator.vibrate([100, 30, 100, 30, 100, 30, 200, 30, 200, 30, 200, 30, 100, 30, 100, 30, 100]);
-	log('Vibration 2 result:', result);
+	logger.log('Vibration 2 result:', result);
 }
 
 //
