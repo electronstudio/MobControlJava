@@ -12,7 +12,13 @@ import log from './lib/logger.js';
 //
 // Configuration.
 //
-const ADDRESS = `${new URL(window.location.href).hostname}:${window.location.port}/mobcontrol/`;
+
+function getAddress() {
+	let url = new URL(window.location.origin);
+	url.protocol='ws';
+	url.pathname='mobcontrol/';
+	return url;
+}
 
 //
 // Get HTML elements.
@@ -113,7 +119,7 @@ function vibrate2() {
 //
 // State transmission.
 //
-const socket = new WebSocket(`ws://${ADDRESS}`);
+const socket = new WebSocket(getAddress());
 
 let lastPayload = null;
 
