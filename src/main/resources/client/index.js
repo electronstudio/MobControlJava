@@ -14,9 +14,9 @@ import log from './lib/logger.js';
 //
 
 function getAddress() {
-	let url = new URL(window.location.origin);
-	url.protocol='ws';
-	url.pathname='mobcontrol/';
+	const url = new URL(window.location.origin);
+	url.protocol = 'ws';
+	url.pathname = 'mobcontrol/';
 	return url;
 }
 
