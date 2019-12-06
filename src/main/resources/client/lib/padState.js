@@ -44,15 +44,15 @@ const inputColours = {
 	},
 };
 
-function getInputTypeFromInputId(inputId) {
-	for (const inputType of Object.keys(inputColours)) {
-		const inputColoursOfType = inputColours[inputType];
-		const inputIdsOfType = Object.values(inputColoursOfType);
-		if (inputIdsOfType.includes(inputId)) {
-			return inputType;
-		}
-	}
-	return 'unknown';
+function getInputTypeFromInput(input) {
+	const inputTypes = Object.keys(inputColours);
+
+	const validInputTypes = inputTypes.filter((inputType) => {
+		const inputsOfType = Object.values(inputColours[inputType]);
+		return inputsOfType.includes(input);
+	});
+
+	return validInputTypes.length > 0 ? validInputTypes[0] : 'unknown';
 }
 
 //
@@ -243,7 +243,7 @@ PadState.prototype.onPointerDown = function onPointerDown(pointer, absX, absY) {
 	const axis2D = inputColours.axis2D[imagePixelString];
 
 	const input = dirpad || button || axis1D || axis2D;
-	const inputType = getInputTypeFromInputId(input);
+	const inputType = getInputTypeFromInput(input);
 
 	// Update pointer cache.
 	if (input) {
@@ -268,7 +268,7 @@ PadState.prototype.onPointerMove = function onPointerMove(pointer, absX, absY) {
 	// Get associated input.
 	const pointerInfo = this.activePointerInfoMap[pointer];
 	const input = pointerInfo && pointerInfo.input;
-	const inputType = getInputTypeFromInputId(input);
+	const inputType = getInputTypeFromInput(input);
 
 	if (input) {
 		if (inputType !== 'button') {
@@ -292,7 +292,7 @@ PadState.prototype.onPointerUp = function onPointerUp(pointer) {
 	// Get associated input.
 	const pointerInfo = this.activePointerInfoMap[pointer];
 	const input = pointerInfo && pointerInfo.input;
-	const inputType = getInputTypeFromInputId(input);
+	const inputType = getInputTypeFromInput(input);
 
 	// Update pointer cache.
 	delete this.activePointerInfoMap[pointer];
