@@ -82,23 +82,28 @@ CanvasImage.prototype.clear = function clear() {
 	this.context.clearRect(0, 0, size.w, size.h);
 };
 
-CanvasImage.prototype.drawBoundingBox = function drawBoundingBox(boundingBox) {
+CanvasImage.prototype.drawBoundingBox = function drawBoundingBox(boundingBox, lineWidth, fillStyle, strokeStyle) {
 	this.context.strokeStyle = 'yellow';
-	this.context.lineWidth = 4;
+	this.context.lineWidth = lineWidth;
+	this.context.fillStyle = fillStyle;
+	this.context.strokeStyle = strokeStyle;
 	this.context.strokeRect(...boundingBox);
 };
 
-CanvasImage.prototype.drawCircle = function drawCircle(x, y, r, fillStyle, strokeStyle) {
+CanvasImage.prototype.drawCircle = function drawCircle(x, y, r, lineWidth, fillStyle, strokeStyle) {
 	this.context.beginPath();
 	this.context.arc(x, y, r, 0, 2 * Math.PI, false);
 	this.context.fillStyle = fillStyle;
 	this.context.fill();
-	this.context.lineWidth = 5;
+	this.context.lineWidth = lineWidth;
 	this.context.strokeStyle = strokeStyle;
 	this.context.stroke();
 };
 
-CanvasImage.prototype.drawLine = function drawLine(x1, y1, x2, y2) {
+CanvasImage.prototype.drawLine = function drawLine(x1, y1, x2, y2, lineWidth, fillStyle, strokeStyle) {
+	this.context.fillStyle = fillStyle;
+	this.context.strokeStyle = strokeStyle;
+	this.context.lineWidth = lineWidth;
 	this.context.beginPath();
 	this.context.moveTo(x1, y1);
 	this.context.lineTo(x2, y2);

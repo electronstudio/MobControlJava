@@ -65,26 +65,33 @@ function redrawBase() {
 }
 
 function redrawOverlay() {
+	const style0 = 'rgba(0,0,0,0.0)';
+	const style1 = 'rgba(0,0,0,0.005)';
+	const style2 = 'rgba(0,0,0,0.02)';
+	const lineWidth = 2;
+	const r = 2;
+
 	// Draw visual verification.
 	overlayCanvasImage.clear();
 
 	padState.getAxisBoundingBoxes().forEach((boundingBox) => {
-		overlayCanvasImage.drawBoundingBox(boundingBox);
+		overlayCanvasImage.drawBoundingBox(boundingBox, lineWidth, style0, style2);
 	});
 
 	padState.getActivePointerInfos().forEach((pointerInfo) => {
 		const { downPosition, movePosition, extentRadius } = pointerInfo;
-		const fillStyle = 'rgba(0,0,0,0.1)';
-		const strokeStyle = 'rgba(0,0,0,0.3)';
+		const x1 = downPosition.absX;
+		const y1 = downPosition.absY;
 
-		overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, 3, fillStyle, strokeStyle);
+		overlayCanvasImage.drawCircle(x1, y1, r, style1, style2);
 
 		if (movePosition) {
-			if (extentRadius) {
-				overlayCanvasImage.drawCircle(downPosition.absX, downPosition.absY, extentRadius, fillStyle, strokeStyle);
-			}
-			overlayCanvasImage.drawCircle(movePosition.absX, movePosition.absY, 6, fillStyle, strokeStyle);
-			overlayCanvasImage.drawLine(downPosition.absX, downPosition.absY, movePosition.absX, movePosition.absY);
+			const x2 = movePosition.absX;
+			const y2 = movePosition.absY;
+
+			if (extentRadius) { overlayCanvasImage.drawCircle(x1, y1, extentRadius, style1, style2); }
+			overlayCanvasImage.drawCircle(x2, y2, lineWidth, style1, style2);
+			overlayCanvasImage.drawLine(x1, y1, x2, y2, lineWidth, style1, style2);
 		}
 	});
 }

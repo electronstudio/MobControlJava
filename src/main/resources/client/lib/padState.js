@@ -109,26 +109,13 @@ PadState.prototype.setState = function setState(partialState) {
 // Bounding box init.
 //
 PadState.prototype.initAxisBoundingBoxes = function initAxisBoundingBoxes() {
-	// Derive and store the bounding boxes of the dirpad colours.
-	for (const pixelString of Object.keys(inputColours.dirpad)) {
-		const dirpad = inputColours.dirpad[pixelString];
-		const rgbas = pixelStringToRgbas(pixelString);
-		this.colourBoundingBoxes[dirpad] = this.sectionCanvasImage.getRgbasBoundingBox(rgbas);
-	}
+	const pixelStringToInputMap = Object.assign({}, ...Object.values(inputColours));
 
-	// Derive and store the bounding boxes of the 1D axis colours.
-	for (const pixelString of Object.keys(inputColours.axis1D)) {
-		const axis = inputColours.axis1D[pixelString];
+	Object.keys(pixelStringToInputMap).forEach((pixelString) => {
+		const input = pixelStringToInputMap[pixelString];
 		const rgbas = pixelStringToRgbas(pixelString);
-		this.colourBoundingBoxes[axis] = this.sectionCanvasImage.getRgbasBoundingBox(rgbas);
-	}
-
-	// Derive and store the bounding boxes of the 2D axis colours.
-	for (const pixelString of Object.keys(inputColours.axis2D)) {
-		const axis = inputColours.axis2D[pixelString];
-		const rgbas = pixelStringToRgbas(pixelString);
-		this.colourBoundingBoxes[axis] = this.sectionCanvasImage.getRgbasBoundingBox(rgbas);
-	}
+		this.colourBoundingBoxes[input] = this.sectionCanvasImage.getRgbasBoundingBox(rgbas);
+	});
 };
 
 //
