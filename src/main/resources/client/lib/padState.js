@@ -149,14 +149,12 @@ export default (function iife() {
 
 	const handlers = {
 		dirpad: {
-			reset: (input) => {
-				return {
-					[`${input}_LEFT`]: false,
-					[`${input}_RIGHT`]: false,
-					[`${input}_UP`]: false,
-					[`${input}_DOWN`]: false,
-				};
-			},
+			reset: (input) => ({
+				[`${input}_LEFT`]: false,
+				[`${input}_RIGHT`]: false,
+				[`${input}_UP`]: false,
+				[`${input}_DOWN`]: false,
+			}),
 			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
 				const boundingBox = colourBoundingBoxes[input];
 				const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
@@ -171,23 +169,17 @@ export default (function iife() {
 			},
 		},
 		button: {
-			reset: (input) => {
-				return {
-					[input]: false,
-				};
-			},
-			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
-				return {
-					[input]: true,
-				};
-			},
+			reset: (input) => ({
+				[input]: false,
+			}),
+			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => ({
+				[input]: true,
+			}),
 		},
 		axis1D: {
-			reset: (input) => {
-				return {
-					[input]: 0,
-				};
-			},
+			reset: (input) => ({
+				[input]: 0,
+			}),
 			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
 				const boundingBox = colourBoundingBoxes[input];
 				const [, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
@@ -197,12 +189,10 @@ export default (function iife() {
 			},
 		},
 		axis2D: {
-			reset: (input) => {
-				return {
-					[`${input}X`]: 0,
-					[`${input}Y`]: 0,
-				};
-			},
+			reset: (input) => ({
+				[`${input}X`]: 0,
+				[`${input}Y`]: 0,
+			}),
 			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
 				const { downPosition, extentRadius } = activePointerInfoMap[pointer];
 
