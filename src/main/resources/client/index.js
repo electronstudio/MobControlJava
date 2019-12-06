@@ -8,6 +8,7 @@
 import CanvasImage from './lib/canvasImage.js';
 import PadState from './lib/padState.js';
 import Logger from './lib/logger.js';
+import Vibration from './lib/vibration.js';
 
 //
 // Configuration.
@@ -46,6 +47,7 @@ const graphicImage = getImage('./pads/1/graphic.svg', redraw);
 // Initialise utilities.
 //
 const logger = new Logger(logElement);
+const vibration = new Vibration(logger);
 const sectionCanvasImage = new CanvasImage(sectionCanvas, sectionImage);
 const graphicCanvasImage = new CanvasImage(graphicCanvas, graphicImage);
 const overlayCanvasImage = new CanvasImage(overlayCanvas, null);
@@ -108,24 +110,6 @@ window.addEventListener('resize', () => {
 });
 
 //
-// Vibration.
-//
-navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
-if ('vibrate' in navigator) {
-	logger.log('Vibration API supported');
-}
-
-function vibrate1(data) {
-	const result = navigator.vibrate(data.duration_ms);
-	logger.log('Vibration 1 result:', result, data.duration_ms / 1000);
-}
-
-function vibrate2() {
-	const result = navigator.vibrate([100, 30, 100, 30, 100, 30, 200, 30, 200, 30, 200, 30, 100, 30, 100, 30, 100]);
-	logger.log('Vibration 2 result:', result);
-}
-
-//
 // State transmission.
 //
 const socket = new WebSocket(getAddress());
@@ -140,8 +124,8 @@ function sendState() {
 		socket.send(thisPayload);
 	}
 
-	if (deltaState.BUTTON_GUIDE) { vibrate1({ duration_ms: 1234 }); }
-	if (deltaState.BUTTON_BACK) { vibrate2(); }
+	if (deltaState.BUTTON_GUIDE) { vibration.testSimple(1234); }
+	if (deltaState.BUTTON_BACK) { vibration.testComplex(); }
 }
 
 //
@@ -150,7 +134,7 @@ function sendState() {
 socket.onmessage = (event) => {
 	const { header, data } = JSON.parse(event.data);
 	switch (header) {
-	case 'vibrate': { vibrate1(data); break; }
+	case 'vibrate': { vibration.run(data); break; }
 	default: { break; }
 	}
 };

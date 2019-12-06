@@ -9,6 +9,7 @@ module.exports = {
 	"extends": "airbnb",
 	"rules": {
 		"import/extensions": 0,
+		"camelcase": 0,
 		"no-unused-vars": ["error", { "args": "none" }],
 		"max-len": [2, 150],
 		"linebreak-style": [2, "windows"],
