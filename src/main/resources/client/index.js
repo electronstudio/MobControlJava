@@ -117,7 +117,7 @@ const socket = new WebSocket(getAddress());
 let lastPayload = null;
 
 function sendState() {
-	const deltaState = padState.getAndResetDeltaState();
+	const deltaState = padState.flushState();
 	const thisPayload = JSON.stringify(deltaState, null, 4);
 	if (lastPayload !== thisPayload) {
 		lastPayload = thisPayload;

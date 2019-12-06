@@ -7,11 +7,20 @@
  */
 
 export default (function iife() {
+	/**
+	 *
+	 * Configuration.
+	 *
+	 */
+
 	const AXIS2D_EXTENT_RADIUS = 20;
 
-	//
-	// Expected colours, for each input type.
-	//
+	/**
+	 *
+	 * Expected colours, for each input type.
+	 *
+	 */
+
 	const inputColours = {
 		dirpad: {
 			// Redundant info but it makes the lookup much easier.
@@ -44,6 +53,12 @@ export default (function iife() {
 		},
 	};
 
+	/**
+	 *
+	 * Utils.
+	 *
+	 */
+
 	function getInputTypeFromInput(input) {
 		const inputTypes = Object.keys(inputColours);
 
@@ -55,23 +70,17 @@ export default (function iife() {
 		return validInputTypes.length > 0 ? validInputTypes[0] : 'unknown';
 	}
 
-	//
-	// RGBA serialisation.
-	//
-	function pixelStringToRgbas(pixelString) {
-		const rgbaStrings = pixelString.split('|');
+	function colourStringToRgbas(colourString) {
+		const rgbaStrings = colourString.split('|');
 		const rgbaStringToRgba = (x) => x.split(',').map((y) => parseInt(y, 10));
 		const rgbas = rgbaStrings.map(rgbaStringToRgba);
 		return rgbas;
 	}
 
-	function rgbaToPixelString(rgba) {
+	function rgbaToColourString(rgba) {
 		return rgba.join(',');
 	}
 
-	//
-	// Utils.
-	//
 	function getBoundingBoxRelativePosition(boundingBox, absX, absY) {
 		const [x, y, w, h] = boundingBox;
 		const centerX = x + (w / 2);
@@ -81,46 +90,39 @@ export default (function iife() {
 		return [relX, relY];
 	}
 
-	//
-	// Contains the state of the pad.
-	//
+	/**
+	 *
+	 * Constructor.
+	 *
+	 */
+
 	function PadState(sectionCanvasImage) {
-		// Underlying image that defines where each button is.
-		this.sectionCanvasImage = sectionCanvasImage;
-
-		// Changes made to the pad state, since the last call of getAndResetDeltaState().
-		// This should only be mutated via setState() + getAndResetDeltaState()!
-		this.deltaState = {};
-
-		// Cache of active pointers to associated info.
-		this.activePointerInfoMap = {};
-
-		// Cache of bounding boxes for move-enabled inputs.
-		this.colourBoundingBoxes = {};
+		/* eslint-disable no-multi-spaces */
+		this.sectionCanvasImage = sectionCanvasImage;   // Image whose colours define the hitbox of each input.
+		this.colourBoundingBoxes = {};                  // Bounding box for each hitbox.
+		this.activePointerInfoMap = {};                 // Metadata for each currently-active pointer.
+		this.deltaState = {};                           // Changes made to the pad state, since the last call to flushDeltaState().
+		/* eslint-enable no-multi-spaces */
 
 		this.resetState();
 	}
 
-	PadState.prototype.setState = function setState(partialState) {
-		this.deltaState = { ...this.deltaState, ...partialState };
-	};
+	/**
+	 *
+	 * Bounding box.
+	 *
+	 */
 
-	//
-	// Bounding box init.
-	//
 	PadState.prototype.initAxisBoundingBoxes = function initAxisBoundingBoxes() {
-		const pixelStringToInputMap = Object.assign({}, ...Object.values(inputColours));
+		const colourStringToInputMap = Object.assign({}, ...Object.values(inputColours));
 
-		Object.keys(pixelStringToInputMap).forEach((pixelString) => {
-			const input = pixelStringToInputMap[pixelString];
-			const rgbas = pixelStringToRgbas(pixelString);
+		Object.keys(colourStringToInputMap).forEach((colourString) => {
+			const input = colourStringToInputMap[colourString];
+			const rgbas = colourStringToRgbas(colourString);
 			this.colourBoundingBoxes[input] = this.sectionCanvasImage.getRgbasBoundingBox(rgbas);
 		});
 	};
 
-	//
-	// Bounding box get.
-	//
 	PadState.prototype.getAxisBoundingBoxes = function getAxisBoundingBoxes() {
 		return Object.values(this.colourBoundingBoxes);
 	};
@@ -129,9 +131,28 @@ export default (function iife() {
 		return Object.values(this.activePointerInfoMap);
 	};
 
-	//
-	// State reset.
-	//
+	/**
+	 *
+	 * State.
+	 *
+	 */
+
+	PadState.prototype.setState = function setState(partialState) {
+		Object.assign(this.deltaState, partialState);
+	};
+
+	PadState.prototype.flushState = function flushDeltaState() {
+		const { deltaState } = this;
+		this.deltaState = {};
+		return deltaState;
+	};
+
+	/**
+	 *
+	 * State reset.
+	 *
+	 */
+
 	PadState.prototype.resetDirpad = function resetDirpad(dirpad) {
 		this.setState({
 			[`${dirpad}_LEFT`]: false,
@@ -167,37 +188,40 @@ export default (function iife() {
 		Object.values(inputColours.axis2D).forEach((axis2D) => { this.resetAxis2D(axis2D); });
 	};
 
-	//
-	// State update.
-	//
-	PadState.prototype.updateDirpad = function updateDirpad(pointer, dirpad, absX, absY) {
-		const boundingBox = this.colourBoundingBoxes[dirpad];
+	/**
+	 *
+	 * State update.
+	 *
+	 */
+
+	PadState.prototype.updateDirpad = function updateDirpad(pointer, input, absX, absY) {
+		const boundingBox = this.colourBoundingBoxes[input];
 		const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 
 		const deadZone = 0.3;
 		this.setState({
-			[`${dirpad}_LEFT`]: relX < -deadZone,
-			[`${dirpad}_RIGHT`]: relX > +deadZone,
-			[`${dirpad}_UP`]: relY < -deadZone,
-			[`${dirpad}_DOWN`]: relY > +deadZone,
+			[`${input}_LEFT`]: relX < -deadZone,
+			[`${input}_RIGHT`]: relX > +deadZone,
+			[`${input}_UP`]: relY < -deadZone,
+			[`${input}_DOWN`]: relY > +deadZone,
 		});
 	};
 
-	PadState.prototype.updateButton = function updateButton(pointer, button, absX, absY) {
+	PadState.prototype.updateButton = function updateButton(pointer, input, absX, absY) {
 		this.setState({
-			[button]: true,
+			[input]: true,
 		});
 	};
 
-	PadState.prototype.updateAxis1D = function updateAxis1D(pointer, axis1D, absX, absY) {
-		const boundingBox = this.colourBoundingBoxes[axis1D];
+	PadState.prototype.updateAxis1D = function updateAxis1D(pointer, input, absX, absY) {
+		const boundingBox = this.colourBoundingBoxes[input];
 		const [, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 		this.setState({
-			[axis1D]: (-relY / 2) + 0.5,
+			[input]: (-relY / 2) + 0.5,
 		});
 	};
 
-	PadState.prototype.updateAxis2D = function updateAxis2D(pointer, axis2D, absX, absY) {
+	PadState.prototype.updateAxis2D = function updateAxis2D(pointer, input, absX, absY) {
 		const { downPosition, extentRadius } = this.activePointerInfoMap[pointer];
 
 		const boundingBox = [
@@ -215,32 +239,26 @@ export default (function iife() {
 		const clampedY = clip ? (relY / magnitude) : relY;
 
 		this.setState({
-			[`${axis2D}X`]: clampedX,
-			[`${axis2D}Y`]: clampedY,
+			[`${input}X`]: clampedX,
+			[`${input}Y`]: clampedY,
 		});
 	};
 
-	//
-	// State get.
-	//
-	PadState.prototype.getAndResetDeltaState = function getAndResetDeltaState() {
-		const { deltaState } = this;
-		this.deltaState = {};
-		return deltaState;
-	};
+	/**
+	 *
+	 * Pointer update.
+	 *
+	 */
 
-	//
-	// React to pointer down/move/up.
-	//
 	PadState.prototype.onPointerDown = function onPointerDown(pointer, absX, absY) {
 		// Get associated input.
 		const rgba = this.sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
-		const imagePixelString = rgbaToPixelString(rgba);
+		const colourString = rgbaToColourString(rgba);
 
-		const dirpad = inputColours.dirpad[imagePixelString];
-		const button = inputColours.button[imagePixelString];
-		const axis1D = inputColours.axis1D[imagePixelString];
-		const axis2D = inputColours.axis2D[imagePixelString];
+		const dirpad = inputColours.dirpad[colourString];
+		const button = inputColours.button[colourString];
+		const axis1D = inputColours.axis1D[colourString];
+		const axis2D = inputColours.axis2D[colourString];
 
 		const input = dirpad || button || axis1D || axis2D;
 		const inputType = getInputTypeFromInput(input);
