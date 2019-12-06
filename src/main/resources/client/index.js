@@ -12,7 +12,7 @@ import log from './lib/logger.js';
 //
 // Configuration.
 //
-const ADDRESS = `${new URL(window.location.href).hostname}/mobcontrol/`;
+const ADDRESS = `${new URL(window.location.href).hostname}:${window.location.port}/mobcontrol/`;
 
 //
 // Get HTML elements.

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
@@ -34,10 +33,8 @@ public class MobTest {
         SDLInfoPanel[] controllerTabs = setup(tabbedPane, testFrame);
 
         try {
-            Desktop.getDesktop().browse(new URI("http://localhost"));
+            Desktop.getDesktop().browse(controllerManager.getURI());
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.utils.Array;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -44,6 +45,9 @@ public class MobControllerManager {
         running = false;
     }
 
+    public URI getURI(){
+        return server.server.getURI();
+    }
 
     /**
      * Call this every frame.  It's not actually necessary for updating the axis and button state

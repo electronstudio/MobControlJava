@@ -41,6 +41,7 @@ public class HttpServer {
         }
     }
 
+
     public HttpServer(int port) throws MalformedURLException, IllegalStateException, URISyntaxException {
         StdErrLog logger = new StdErrLog();
         logger.setLevel(StdErrLog.LEVEL_INFO);
