@@ -133,19 +133,9 @@ export default (function iife() {
 
 	/**
 	 *
-	 * State.
+	 * Input Type handling.
 	 *
 	 */
-
-	PadState.prototype.setState = function setState(partialState) {
-		Object.assign(this.deltaState, partialState);
-	};
-
-	PadState.prototype.flushState = function flushDeltaState() {
-		const { deltaState } = this;
-		this.deltaState = {};
-		return deltaState;
-	};
 
 	const handlers = {
 		dirpad: {
@@ -155,9 +145,8 @@ export default (function iife() {
 				[`${input}_UP`]: false,
 				[`${input}_DOWN`]: false,
 			}),
-			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
-				const boundingBox = colourBoundingBoxes[input];
-				const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
+			update: (inputBoundingBox, pointerInfo, input, absX, absY) => {
+				const [relX, relY] = getBoundingBoxRelativePosition(inputBoundingBox, absX, absY);
 
 				const deadZone = 0.3;
 				return {
@@ -172,7 +161,7 @@ export default (function iife() {
 			reset: (input) => ({
 				[input]: false,
 			}),
-			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => ({
+			update: (inputBoundingBox, pointerInfo, input, absX, absY) => ({
 				[input]: true,
 			}),
 		},
@@ -180,9 +169,8 @@ export default (function iife() {
 			reset: (input) => ({
 				[input]: 0,
 			}),
-			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
-				const boundingBox = colourBoundingBoxes[input];
-				const [, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
+			update: (inputBoundingBox, pointerInfo, input, absX, absY) => {
+				const [, relY] = getBoundingBoxRelativePosition(inputBoundingBox, absX, absY);
 				return {
 					[input]: (-relY / 2) + 0.5,
 				};
@@ -193,8 +181,8 @@ export default (function iife() {
 				[`${input}X`]: 0,
 				[`${input}Y`]: 0,
 			}),
-			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
-				const { downPosition, extentRadius } = activePointerInfoMap[pointer];
+			update: (inputBoundingBox, pointerInfo, input, absX, absY) => {
+				const { downPosition, extentRadius } = pointerInfo;
 
 				const boundingBox = [
 					downPosition.absX - extentRadius,
@@ -218,11 +206,39 @@ export default (function iife() {
 		},
 	};
 
+	/**
+	 *
+	 * State.
+	 *
+	 */
+
+	PadState.prototype.setState = function setState(partialState) {
+		Object.assign(this.deltaState, partialState);
+	};
+
+	PadState.prototype.flushState = function flushDeltaState() {
+		const { deltaState } = this;
+		this.deltaState = {};
+		return deltaState;
+	};
+
 	PadState.prototype.resetState = function resetState() {
 		Object.values(inputColours.dirpad).forEach((dirpad) => { this.setState(handlers.dirpad.reset(dirpad)); });
 		Object.values(inputColours.button).forEach((button) => { this.setState(handlers.button.reset(button)); });
 		Object.values(inputColours.axis1D).forEach((axis1D) => { this.setState(handlers.axis1D.reset(axis1D)); });
 		Object.values(inputColours.axis2D).forEach((axis2D) => { this.setState(handlers.axis2D.reset(axis2D)); });
+	};
+
+	PadState.prototype.getInputFromRgba = function getInputFromRgba(rgba) {
+		const colourString = rgbaToColourString(rgba);
+
+		const dirpad = inputColours.dirpad[colourString];
+		const button = inputColours.button[colourString];
+		const axis1D = inputColours.axis1D[colourString];
+		const axis2D = inputColours.axis2D[colourString];
+
+		const input = dirpad || button || axis1D || axis2D;
+		return input;
 	};
 
 	/**
@@ -234,29 +250,25 @@ export default (function iife() {
 	PadState.prototype.onPointerDown = function onPointerDown(pointer, absX, absY) {
 		// Get associated input.
 		const rgba = this.sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
-		const colourString = rgbaToColourString(rgba);
-
-		const dirpad = inputColours.dirpad[colourString];
-		const button = inputColours.button[colourString];
-		const axis1D = inputColours.axis1D[colourString];
-		const axis2D = inputColours.axis2D[colourString];
-
-		const input = dirpad || button || axis1D || axis2D;
+		const input = this.getInputFromRgba(rgba);
 		const inputType = getInputTypeFromInput(input);
 
-		// Update pointer cache.
 		if (input) {
+			// Update pointer cache.
 			this.activePointerInfoMap[pointer] = {
 				input,
 				downPosition: { absX, absY },
-				extentRadius: axis2D && AXIS2D_EXTENT_RADIUS,
+				extentRadius: inputType === 'axis2D' && AXIS2D_EXTENT_RADIUS,
 			};
-		}
 
-		// Update state.
-		const handler = handlers[inputType];
-		if (handler) {
-			this.setState(handlers[inputType].update(this.colourBoundingBoxes, this.activePointerInfoMap, pointer, input, absX, absY));
+			// Update state.
+			const handler = handlers[inputType];
+			if (handler) {
+				const inputBoundingBox = this.colourBoundingBoxes[input];
+				const pointerInfo = this.activePointerInfoMap[pointer];
+				const partialState = handlers[inputType].update(inputBoundingBox, pointerInfo, input, absX, absY);
+				this.setState(partialState);
+			}
 		}
 	};
 
@@ -266,18 +278,18 @@ export default (function iife() {
 		const input = pointerInfo && pointerInfo.input;
 		const inputType = getInputTypeFromInput(input);
 
-		if (input) {
-			if (inputType !== 'button') {
-				// Update pointer cache.
-				Object.assign(this.activePointerInfoMap[pointer], {
-					movePosition: { absX, absY },
-				});
+		if (input && inputType !== 'button') {
+			// Update pointer cache.
+			Object.assign(this.activePointerInfoMap[pointer], {
+				movePosition: { absX, absY },
+			});
 
-				// Update state.
-				const handler = handlers[inputType];
-				if (handler) {
-					this.setState(handlers[inputType].update(this.colourBoundingBoxes, this.activePointerInfoMap, pointer, input, absX, absY));
-				}
+			// Update state.
+			const handler = handlers[inputType];
+			if (handler) {
+				const inputBoundingBox = this.colourBoundingBoxes[input];
+				const partialState = handler.update(inputBoundingBox, pointerInfo, input, absX, absY);
+				this.setState(partialState);
 			}
 		}
 	};
@@ -294,7 +306,8 @@ export default (function iife() {
 		// Update state.
 		const handler = handlers[inputType];
 		if (handler) {
-			this.setState(handlers[inputType].reset(input));
+			const partialState = handler.reset(input);
+			this.setState(partialState);
 		}
 	};
 
