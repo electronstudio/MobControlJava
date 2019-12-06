@@ -147,101 +147,92 @@ export default (function iife() {
 		return deltaState;
 	};
 
-	/**
-	 *
-	 * State reset.
-	 *
-	 */
+	const handlers = {
+		dirpad: {
+			reset: (input) => {
+				return {
+					[`${input}_LEFT`]: false,
+					[`${input}_RIGHT`]: false,
+					[`${input}_UP`]: false,
+					[`${input}_DOWN`]: false,
+				};
+			},
+			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
+				const boundingBox = colourBoundingBoxes[input];
+				const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
 
-	PadState.prototype.resetDirpad = function resetDirpad(dirpad) {
-		this.setState({
-			[`${dirpad}_LEFT`]: false,
-			[`${dirpad}_RIGHT`]: false,
-			[`${dirpad}_UP`]: false,
-			[`${dirpad}_DOWN`]: false,
-		});
-	};
+				const deadZone = 0.3;
+				return {
+					[`${input}_LEFT`]: relX < -deadZone,
+					[`${input}_RIGHT`]: relX > +deadZone,
+					[`${input}_UP`]: relY < -deadZone,
+					[`${input}_DOWN`]: relY > +deadZone,
+				};
+			},
+		},
+		button: {
+			reset: (input) => {
+				return {
+					[input]: false,
+				};
+			},
+			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
+				return {
+					[input]: true,
+				};
+			},
+		},
+		axis1D: {
+			reset: (input) => {
+				return {
+					[input]: 0,
+				};
+			},
+			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
+				const boundingBox = colourBoundingBoxes[input];
+				const [, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
+				return {
+					[input]: (-relY / 2) + 0.5,
+				};
+			},
+		},
+		axis2D: {
+			reset: (input) => {
+				return {
+					[`${input}X`]: 0,
+					[`${input}Y`]: 0,
+				};
+			},
+			update: (colourBoundingBoxes, activePointerInfoMap, pointer, input, absX, absY) => {
+				const { downPosition, extentRadius } = activePointerInfoMap[pointer];
 
-	PadState.prototype.resetButton = function resetButton(button) {
-		this.setState({
-			[button]: false,
-		});
-	};
+				const boundingBox = [
+					downPosition.absX - extentRadius,
+					downPosition.absY - extentRadius,
+					extentRadius * 2,
+					extentRadius * 2,
+				];
 
-	PadState.prototype.resetAxis1D = function resetAxis1D(axis1D) {
-		this.setState({
-			[axis1D]: 0,
-		});
-	};
+				const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
+				const magnitude = Math.sqrt(relX * relX + relY * relY);
+				const clip = magnitude > 1;
 
-	PadState.prototype.resetAxis2D = function resetAxis2D(axis2D) {
-		this.setState({
-			[`${axis2D}X`]: 0,
-			[`${axis2D}Y`]: 0,
-		});
+				const clampedX = clip ? (relX / magnitude) : relX;
+				const clampedY = clip ? (relY / magnitude) : relY;
+
+				return {
+					[`${input}X`]: clampedX,
+					[`${input}Y`]: clampedY,
+				};
+			},
+		},
 	};
 
 	PadState.prototype.resetState = function resetState() {
-		Object.values(inputColours.dirpad).forEach((dirpad) => { this.resetDirpad(dirpad); });
-		Object.values(inputColours.button).forEach((button) => { this.resetButton(button); });
-		Object.values(inputColours.axis1D).forEach((axis1D) => { this.resetAxis1D(axis1D); });
-		Object.values(inputColours.axis2D).forEach((axis2D) => { this.resetAxis2D(axis2D); });
-	};
-
-	/**
-	 *
-	 * State update.
-	 *
-	 */
-
-	PadState.prototype.updateDirpad = function updateDirpad(pointer, input, absX, absY) {
-		const boundingBox = this.colourBoundingBoxes[input];
-		const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
-
-		const deadZone = 0.3;
-		this.setState({
-			[`${input}_LEFT`]: relX < -deadZone,
-			[`${input}_RIGHT`]: relX > +deadZone,
-			[`${input}_UP`]: relY < -deadZone,
-			[`${input}_DOWN`]: relY > +deadZone,
-		});
-	};
-
-	PadState.prototype.updateButton = function updateButton(pointer, input, absX, absY) {
-		this.setState({
-			[input]: true,
-		});
-	};
-
-	PadState.prototype.updateAxis1D = function updateAxis1D(pointer, input, absX, absY) {
-		const boundingBox = this.colourBoundingBoxes[input];
-		const [, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
-		this.setState({
-			[input]: (-relY / 2) + 0.5,
-		});
-	};
-
-	PadState.prototype.updateAxis2D = function updateAxis2D(pointer, input, absX, absY) {
-		const { downPosition, extentRadius } = this.activePointerInfoMap[pointer];
-
-		const boundingBox = [
-			downPosition.absX - extentRadius,
-			downPosition.absY - extentRadius,
-			extentRadius * 2,
-			extentRadius * 2,
-		];
-
-		const [relX, relY] = getBoundingBoxRelativePosition(boundingBox, absX, absY);
-		const magnitude = Math.sqrt(relX * relX + relY * relY);
-		const clip = magnitude > 1;
-
-		const clampedX = clip ? (relX / magnitude) : relX;
-		const clampedY = clip ? (relY / magnitude) : relY;
-
-		this.setState({
-			[`${input}X`]: clampedX,
-			[`${input}Y`]: clampedY,
-		});
+		Object.values(inputColours.dirpad).forEach((dirpad) => { this.setState(handlers.dirpad.reset(dirpad)); });
+		Object.values(inputColours.button).forEach((button) => { this.setState(handlers.button.reset(button)); });
+		Object.values(inputColours.axis1D).forEach((axis1D) => { this.setState(handlers.axis1D.reset(axis1D)); });
+		Object.values(inputColours.axis2D).forEach((axis2D) => { this.setState(handlers.axis2D.reset(axis2D)); });
 	};
 
 	/**
@@ -273,12 +264,9 @@ export default (function iife() {
 		}
 
 		// Update state.
-		switch (inputType) {
-		case 'dirpad': { this.updateDirpad(pointer, input, absX, absY); break; }
-		case 'button': { this.updateButton(pointer, input, absX, absY); break; }
-		case 'axis1D': { this.updateAxis1D(pointer, input, absX, absY); break; }
-		case 'axis2D': { this.updateAxis2D(pointer, input, absX, absY); break; }
-		default: { break; }
+		const handler = handlers[inputType];
+		if (handler) {
+			this.setState(handlers[inputType].update(this.colourBoundingBoxes, this.activePointerInfoMap, pointer, input, absX, absY));
 		}
 	};
 
@@ -296,11 +284,9 @@ export default (function iife() {
 				});
 
 				// Update state.
-				switch (inputType) {
-				case 'dirpad': { this.updateDirpad(pointer, input, absX, absY); break; }
-				case 'axis1D': { this.updateAxis1D(pointer, input, absX, absY); break; }
-				case 'axis2D': { this.updateAxis2D(pointer, input, absX, absY); break; }
-				default: { break; }
+				const handler = handlers[inputType];
+				if (handler) {
+					this.setState(handlers[inputType].update(this.colourBoundingBoxes, this.activePointerInfoMap, pointer, input, absX, absY));
 				}
 			}
 		}
@@ -316,12 +302,9 @@ export default (function iife() {
 		delete this.activePointerInfoMap[pointer];
 
 		// Update state.
-		switch (inputType) {
-		case 'dirpad': { this.resetDirpad(input); break; }
-		case 'button': { this.resetButton(input); break; }
-		case 'axis1D': { this.resetAxis1D(input); break; }
-		case 'axis2D': { this.resetAxis2D(input); break; }
-		default: { break; }
+		const handler = handlers[inputType];
+		if (handler) {
+			this.setState(handlers[inputType].reset(input));
 		}
 	};
 
