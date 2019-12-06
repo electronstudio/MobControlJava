@@ -38,8 +38,8 @@ function getImage(imageSrc, onLoad) {
 	return image;
 }
 
-const sectionImage = getImage('./section.png', redraw);
-const graphicImage = getImage('./graphic.svg', redraw);
+const sectionImage = getImage('./pads/1/section.png', redraw);
+const graphicImage = getImage('./pads/1/graphic.svg', redraw);
 
 //
 // Initialise utilities.
