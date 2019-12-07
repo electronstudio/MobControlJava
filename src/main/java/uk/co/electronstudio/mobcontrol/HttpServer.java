@@ -51,6 +51,8 @@ public class HttpServer {
         servletHandler.setContextPath("/");
         ServletHolder holderEvents = new ServletHolder("ws-events", Servlet.class);
         servletHandler.addServlet(holderEvents, "/mobcontrol/*");
+        servletHandler.setStopTimeout(3000);
+        servletHandler.getSessionHandler().setMaxInactiveInterval(3);
 
         URL webRootLocation = this.getClass().getResource("/client/index.html");
         if (webRootLocation == null) {
@@ -73,6 +75,8 @@ public class HttpServer {
 
 
         server = new Server();
+        server.setStopAtShutdown(true);
+        server.setStopTimeout(3000);
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
         server.addConnector(connector);

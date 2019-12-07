@@ -6,9 +6,10 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.utils.Array;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -47,6 +48,22 @@ public class MobControllerManager {
 
     public URI getURI(){
         return server.server.getURI();
+    }
+
+    public String[] getHostAddresses() {
+        Set<String> HostAddresses = new HashSet<>();
+        try {
+            for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                if (!ni.isLoopback() && ni.isUp() && ni.getHardwareAddress() != null) {
+                    for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
+                        if (ia.getBroadcast() != null) {  //If limited to IPV4
+                            HostAddresses.add(ia.getAddress().getHostAddress());
+                        }
+                    }
+                }
+            }
+        } catch (SocketException e) { }
+        return HostAddresses.toArray(new String[0]);
     }
 
     /**

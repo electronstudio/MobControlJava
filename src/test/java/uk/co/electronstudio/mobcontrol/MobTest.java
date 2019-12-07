@@ -2,9 +2,9 @@ package uk.co.electronstudio.mobcontrol;
 
 import com.badlogic.gdx.controllers.Controller;
 
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,6 +30,21 @@ public class MobTest {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         JFrame testFrame = new JFrame();
+
+        testFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        testFrame.addWindowListener( new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+                controllerManager.stop();
+                System.out.println("CLOSE");
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } );
+
         SDLInfoPanel[] controllerTabs = setup(tabbedPane, testFrame);
 
         try {
@@ -72,8 +87,11 @@ public class MobTest {
         } catch (Exception sdl_error) {
             sdl_error.printStackTrace();
         }
-        for (int i = 0; i < controllerManager.getControllers().size; i++) {
-            Controller controllerAtIndex = controllerManager.getControllers().get(i);
+        for (int i = 0; i < 5; i++) {
+            Controller controllerAtIndex = null;
+            try{
+                controllerAtIndex = controllerManager.getControllers().get(i);
+            }catch (IndexOutOfBoundsException e){}
             controllerTabs[i].updatePanel((MobController) controllerAtIndex);
         }
         testFrame.repaint();
@@ -161,6 +179,11 @@ public class MobTest {
         }
 
         public void updatePanel(MobController c) {
+            if(c==null){
+                axes.removeAll();
+                buttons.removeAll();
+                return;
+            }
             try {
                 titleLabel.setText(c.getName());
 
@@ -168,7 +191,7 @@ public class MobTest {
                 for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++) {
                     JLabel label = new JLabel();
                     label.setPreferredSize(new Dimension(100, 30));
-                    label.setText(c.getAxisName(i));//SDL.SDL_GameControllerGetStringForAxis(i));
+                    label.setText(MobController.getAxisName(i));//SDL.SDL_GameControllerGetStringForAxis(i));
 
                     JProgressBar progressBar = new JProgressBar(-100, 100);
                     progressBar.setPreferredSize(new Dimension(200, 30));
@@ -183,7 +206,7 @@ public class MobTest {
 
                 buttons.removeAll();
                 for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
-                    JButton button = new JButton(c.getButtonName(i));
+                    JButton button = new JButton(MobController.getButtonName(i));
                     button.setEnabled(c.getButton(i));
                     buttons.add(button);
                 }

@@ -2,10 +2,10 @@ package uk.co.electronstudio.mobcontrol;
 
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import static uk.co.electronstudio.mobcontrol.MobController.*;
@@ -68,9 +68,12 @@ public class WebSocket extends WebSocketAdapter {
         String json = "{ \"header\": \"vibrate\", \"data\": { \"mag_left\": "+leftMagnitude+", \"mag_right\": "+rightMagnitude+", \"duration_ms\": "+duration_ms+" } }";
         System.out.println(json);
         try {
-            getRemote().sendString(json);
-            getRemote().flush();
-        } catch (IOException e) {
+            RemoteEndpoint remote = getRemote();
+            if(remote!=null) {
+                remote.sendString(json);
+                getRemote().flush();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
