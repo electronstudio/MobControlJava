@@ -14,10 +14,21 @@ export default (function iife() {
 		}
 	}
 
+	Vibration.prototype.getVibrationArray = function getVibrationArray(pct, duration) {
+		const arrSum = (arr) => arr.reduce((a, b) => a + b, 0);
+		const pattern = [Math.floor(100 * pct), 1];
+		const patternDuration = arrSum(pattern);
+		const patternRepeat = Math.floor(duration / patternDuration);
+		const vibrationArray = [].concat(...Array(patternRepeat).fill(pattern));
+		return vibrationArray;
+	};
+
 	Vibration.prototype.run = function run(data) {
 		const { mag_left, mag_right, duration_ms } = data;
-		const result = navigator.vibrate(duration_ms);
-		this.logger.log('V:', result, mag_left, mag_right, duration_ms / 1000);
+		const mag = (mag_left + mag_right) / 2;
+		const vibrationArray = this.getVibrationArray(mag, duration_ms);
+		const result = navigator.vibrate(vibrationArray);
+		this.logger.log('V2:', result, vibrationArray);
 	};
 
 	Vibration.prototype.testSimple = function testSimple(durationMs) {
