@@ -9,17 +9,7 @@ import CanvasImage from './lib/canvasImage.js';
 import PadState from './lib/padState.js';
 import Logger from './lib/logger.js';
 import Vibration from './lib/vibration.js';
-
-//
-// Configuration.
-//
-
-function getAddress() {
-	const url = new URL(window.location.origin);
-	url.protocol = 'ws';
-	url.pathname = 'mobcontrol/';
-	return url;
-}
+import Conn from './lib/conn.js';
 
 //
 // Get HTML elements.
@@ -112,7 +102,7 @@ window.addEventListener('resize', () => {
 //
 // State transmission.
 //
-const socket = new WebSocket(getAddress());
+const conn = new Conn();
 
 let lastPayload = null;
 
@@ -121,7 +111,7 @@ function sendState() {
 	const thisPayload = JSON.stringify(deltaState, null, 4);
 	if (lastPayload !== thisPayload) {
 		lastPayload = thisPayload;
-		socket.send(thisPayload);
+		conn.send(thisPayload);
 	}
 
 	if (deltaState.BUTTON_GUIDE) { vibration.testSimple(1234); }
@@ -131,13 +121,15 @@ function sendState() {
 //
 // Receive messages.
 //
-socket.onmessage = (event) => {
-	const { header, data } = JSON.parse(event.data);
-	switch (header) {
+
+const sub = (type, data) => {
+	switch (type) {
 	case 'vibrate': { vibration.run(data); break; }
 	default: { break; }
 	}
 };
+
+conn.addSub(sub);
 
 //
 // React to user interaction.
