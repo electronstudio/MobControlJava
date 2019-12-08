@@ -26,47 +26,60 @@
 			background-color: black;
 		}
 
-		#container {
-			display: flex;
-		}
-
-		#canvasGuide {
+		.guide {
 			position: relative;
 			width: 100%;
 			height: 100vh;
 		}
 
-		#sectionCanvas:focus {
-			outline: none;
-		}
-
-		#log {
-			height: 100vh;
-		}
-
-		.canvas {
-			display: block;
+		.follower {
 			position: absolute;
 			width: 100%;
 			height: 100%;
 		}
 
+		.canvas {
+			display: block;
+		}
+
+		.vStretch {
+			height: 100vh;
+		}
+
 		.passthrough {
 			pointer-events: none;
-			/* opacity: 30%; */
+		}
+
+		#setPage {
+			display: flex;
+			background-color: black;
+			color: white;
+		}
+
+		#padPage {
+			display: flex;
+		}
+
+		#sectionCanvas:focus {
+			outline: none;
 		}
 	</style>
 
 </head>
 	<body>
-		<div id="container">
-			<div id="canvasGuide">
-				<canvas id="sectionCanvas" class="canvas"></canvas>
-				<canvas id="graphicCanvas" class="canvas passthrough"></canvas>
-				<canvas id="overlayCanvas" class="canvas passthrough"></canvas>
+		<div id="pageContainer" class="guide vStretch">
+			<div id="setPage" class="follower">
+				This is the settings page. Flip to landscape to show the pad.
 			</div>
-			<!-- Uncomment the element below to enable log view -->
-			<textarea id="log"></textarea>
+			<div id="padPage" class="follower">
+				<div id="canvasGuide" class="guide">
+					<canvas id="sectionCanvas" class="canvas follower"></canvas>
+					<canvas id="graphicCanvas" class="canvas follower passthrough"></canvas>
+					<canvas id="overlayCanvas" class="canvas follower passthrough"></canvas>
+				</div>
+				<!-- Uncomment the element below to enable log view -->
+				<textarea id="log" class="vStretch"></textarea>
+			</div>
 		</div>
 	</body>
 </html>
