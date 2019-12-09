@@ -15,7 +15,7 @@ const setPageElement = document.getElementById('setPage');
 const logElement = document.getElementById('log');
 const logger = new Logger(logElement);
 
-const conn = new Conn();
+const conn = new Conn(logger);
 const padPage = new PadPage(conn, logger);
 export default padPage;
 
