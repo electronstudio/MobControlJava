@@ -53,33 +53,42 @@ export default (function iife() {
 		}
 
 		function redrawOverlay() {
-			const style0 = 'rgba(0,0,0,0.0)';
-			const style1 = 'rgba(0,0,0,0.005)';
-			const style2 = 'rgba(0,0,0,0.02)';
-			const lineWidth = 2;
-			const r = 2;
-
-			// Draw visual verification.
 			overlayCanvasImage.clear();
 
+			// Draw very faint bounding boxes.
 			padState.getAxisBoundingBoxes().forEach((boundingBox) => {
-				overlayCanvasImage.drawBoundingBox(boundingBox, lineWidth, style0, style2);
+				overlayCanvasImage.drawBoundingBox({ boundingBox, lineWidth: 2, fillColour: 'rgba(0,0,0,0.0)', outlineWidth: 'rgba(0,0,0,0.02)' });
 			});
 
 			padState.getActivePointerInfos().forEach((pointerInfo) => {
-				const { downPosition, movePosition, extentRadius } = pointerInfo;
-				const x1 = downPosition.absX;
-				const y1 = downPosition.absY;
+				// Derive dimensions relative to the screen resolution.
+				const windowHeight = graphicCanvasImage.getSize().h;
+				const bigRadius = Math.floor(windowHeight * 0.2);
+				const dotRadius = Math.floor(bigRadius / 10);
+				const thinWidth = Math.floor(dotRadius / 3);
+				const thickWidth = thinWidth * 4;
 
-				overlayCanvasImage.drawCircle(x1, y1, r, style1, style2);
+				// Main colours.
+				const fillColour = 'rgba(0,0,255,0.7)';
+				const outlineColour = 'rgba(0,0,0,0.8)';
+
+				const { downPosition, movePosition, extentRadius } = pointerInfo;
+
+				// Draw a dot on wherever is pressed down.
+				overlayCanvasImage.drawCircle({ x: downPosition.absX, y: downPosition.absY, r: dotRadius, fillColour, outlineColour, outlineWidth: thinWidth });
 
 				if (movePosition) {
-					const x2 = movePosition.absX;
-					const y2 = movePosition.absY;
+					// Draw a line between the down and move positions.
+					overlayCanvasImage.drawLine({ x1: downPosition.absX, y1: downPosition.absY, x2: movePosition.absX, y2: movePosition.absY, colour: outlineColour, lineWidth: thinWidth });
 
-					if (extentRadius) { overlayCanvasImage.drawCircle(x1, y1, extentRadius, style1, style2); }
-					overlayCanvasImage.drawCircle(x2, y2, lineWidth, style1, style2);
-					overlayCanvasImage.drawLine(x1, y1, x2, y2, lineWidth, style1, style2);
+					const isAxis2D = extentRadius;
+					if (isAxis2D) {
+						// Draw a circle where the pointer was down. (With thick outline.)
+						overlayCanvasImage.drawCircle({ x: downPosition.absX, y: downPosition.absY, r: bigRadius, fillColour, outlineColour, outlineWidth: thickWidth });
+
+						// Draw a circle where the pointer has moved to. (With thin outline.)
+						overlayCanvasImage.drawCircle({ x: movePosition.absX, y: movePosition.absY, r: bigRadius, fillColour, outlineColour, outlineWidth: thinWidth });
+					}
 				}
 			});
 		}

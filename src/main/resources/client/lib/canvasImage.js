@@ -80,27 +80,26 @@ export default (function ctr() {
 		this.context.clearRect(0, 0, size.w, size.h);
 	};
 
-	CanvasImage.prototype.drawBoundingBox = function drawBoundingBox(boundingBox, lineWidth, fillStyle, strokeStyle) {
+	CanvasImage.prototype.drawBoundingBox = function drawBoundingBox({ boundingBox, lineWidth, fillColour, outlineWidth }) {
 		this.context.strokeStyle = 'yellow';
 		this.context.lineWidth = lineWidth;
-		this.context.fillStyle = fillStyle;
-		this.context.strokeStyle = strokeStyle;
+		this.context.fillStyle = fillColour;
+		this.context.strokeStyle = outlineWidth;
 		this.context.strokeRect(...boundingBox);
 	};
 
-	CanvasImage.prototype.drawCircle = function drawCircle(x, y, r, lineWidth, fillStyle, strokeStyle) {
+	CanvasImage.prototype.drawCircle = function drawCircle({ x, y, r, fillColour, outlineColour, outlineWidth }) {
+		this.context.fillStyle = fillColour;
+		this.context.lineWidth = outlineWidth;
+		this.context.strokeStyle = outlineColour;
 		this.context.beginPath();
 		this.context.arc(x, y, r, 0, 2 * Math.PI, false);
-		this.context.fillStyle = fillStyle;
 		this.context.fill();
-		this.context.lineWidth = lineWidth;
-		this.context.strokeStyle = strokeStyle;
 		this.context.stroke();
 	};
 
-	CanvasImage.prototype.drawLine = function drawLine(x1, y1, x2, y2, lineWidth, fillStyle, strokeStyle) {
-		this.context.fillStyle = fillStyle;
-		this.context.strokeStyle = strokeStyle;
+	CanvasImage.prototype.drawLine = function drawLine({ x1, y1, x2, y2, lineWidth, colour }) {
+		this.context.strokeStyle = colour;
 		this.context.lineWidth = lineWidth;
 		this.context.beginPath();
 		this.context.moveTo(x1, y1);
