@@ -4,15 +4,22 @@ export default (function iife() {
 		this.url = new URL(window.location.origin);
 		this.url.protocol = 'ws';
 		this.url.pathname = 'mobcontrol/';
+		this.subs = [];
 
 		this.setupSocket();
 
-		window.setTimeout(checkConnection.bind(this), 5000);
+		setTimeout(() => { this.checkConnection(); }, 5000);
 	}
 
 	Conn.prototype.setupSocket = function setupSocket() {
+		if (this.socket) {
+			this.socket.onmessage = null;
+			this.socket.onerror = null;
+			this.socket.onclose = null;
+			this.socket.onopen = null;
+		}
+
 		this.socket = new WebSocket(this.url);
-		this.subs = [];
 
 		this.socket.onmessage = (event) => {
 			const { header, __type__, data } = JSON.parse(event.data);
@@ -23,29 +30,32 @@ export default (function iife() {
 		};
 
 		this.socket.onerror = (event) => {
-			this.logger.log('event: socket connection error');
+			this.logger.log('Socket error');
 		};
 
 		this.socket.onclose = (event) => {
-			this.logger.log('event: socket connection closed');
+			this.logger.log('Socket closed');
 		};
 
 		this.socket.onopen = (event) => {
-			this.logger.log('event: socket connection opened');
+			this.logger.log('Socket opened');
 		};
 	};
 
-	function checkConnection() {
+	Conn.prototype.checkConnection = function checkConnection() {
 		if (this.socket.readyState === WebSocket.CLOSED) {
-			this.logger.log('socket state: CLOSED, reconnecting...');
+			this.logger.log('Socket CLOSED, reconnecting...');
 			this.setupSocket();
 		} else if (this.socket.readyState === WebSocket.CLOSING) {
-			this.logger.log('socket state: CLOSING (should not last for long, if it does we ought to close it');
+			// Should not last for long, if it does we ought to close it.
+			this.logger.log('Socket CLOSING');
 		} else if (this.socket.readyState === WebSocket.CONNECTING) {
-			this.logger.log('socket state: CONNECTING (should not last for long, if it does we ought to close it');
+			// Should not last for long, if it does we ought to close it.
+			this.logger.log('Socket CONNECTING');
 		}
-		window.setTimeout(checkConnection.bind(this), 2000);
-	}
+
+		setTimeout(() => { this.checkConnection(); }, 2000);
+	};
 
 
 	Conn.prototype.send = function send(payload) {
