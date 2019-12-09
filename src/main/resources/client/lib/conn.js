@@ -1,5 +1,4 @@
 export default (function iife() {
-
 	function Conn(logger) {
 		this.logger = logger;
 		this.url = new URL(window.location.origin);
@@ -9,7 +8,6 @@ export default (function iife() {
 		this.setupSocket();
 
 		window.setTimeout(checkConnection.bind(this), 5000);
-
 	}
 
 	Conn.prototype.setupSocket = function setupSocket() {
@@ -25,34 +23,34 @@ export default (function iife() {
 		};
 
 		this.socket.onerror = (event) => {
-			this.logger.log("event: socket connection error")
+			this.logger.log('event: socket connection error');
 		};
 
 		this.socket.onclose = (event) => {
-			this.logger.log("event: socket connection closed")
+			this.logger.log('event: socket connection closed');
 		};
 
 		this.socket.onopen = (event) => {
-			this.logger.log("event: socket connection opened")
+			this.logger.log('event: socket connection opened');
 		};
 	};
 
 	function checkConnection() {
-		if(this.socket.readyState === WebSocket.CLOSED) {
-			this.logger.log("socket state: CLOSED, reconnecting...");
-			this.setupSocket()
-		}else if(this.socket.readyState === WebSocket.CLOSING) {
-			this.logger.log("socket state: CLOSING (should not last for long, if it does we ought to close it");
-		}else if(this.socket.readyState === WebSocket.CONNECTING) {
-			this.logger.log("socket state: CONNECTING (should not last for long, if it does we ought to close it");
+		if (this.socket.readyState === WebSocket.CLOSED) {
+			this.logger.log('socket state: CLOSED, reconnecting...');
+			this.setupSocket();
+		} else if (this.socket.readyState === WebSocket.CLOSING) {
+			this.logger.log('socket state: CLOSING (should not last for long, if it does we ought to close it');
+		} else if (this.socket.readyState === WebSocket.CONNECTING) {
+			this.logger.log('socket state: CONNECTING (should not last for long, if it does we ought to close it');
 		}
 		window.setTimeout(checkConnection.bind(this), 2000);
 	}
 
 
 	Conn.prototype.send = function send(payload) {
-		if(this.socket.readyState != WebSocket.OPEN) {
-			this.logger.log("WARNING: sending to closed socket. bufferedamount: "+this.socket.bufferedAmount)
+		if (this.socket.readyState !== WebSocket.OPEN) {
+			this.logger.log(`WARNING: sending to closed socket. bufferedamount: ${this.socket.bufferedAmount}`);
 		}
 		this.socket.send(payload);
 	};
