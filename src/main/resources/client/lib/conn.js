@@ -1,4 +1,4 @@
-const SOCKET_TIMEOUT_MS = 10 * 1000;
+const SOCKET_TIMEOUT_MS = 5 * 1000;
 
 export default (function iife() {
 	function Conn(logger) {
@@ -23,7 +23,7 @@ export default (function iife() {
 		}
 
 		// Return how long the state has been the same for.
-		const socketStateDurationMs = this.socketStateLastModified - Date.now();
+		const socketStateDurationMs = Date.now() - this.socketStateLastModified;
 		return socketStateDurationMs;
 	};
 
@@ -34,6 +34,8 @@ export default (function iife() {
 			this.socket.onclose = null;
 			this.socket.onopen = null;
 		}
+
+		this.updateSocketState(null);
 
 		this.socket = new WebSocket(this.url);
 
@@ -46,45 +48,44 @@ export default (function iife() {
 		};
 
 		this.socket.onerror = (event) => {
-			this.updateSocketState('socket.onerror');
-			this.logger.log('Socket error');
+			this.logger.log('Event: Socket error');
 		};
 
 		this.socket.onclose = (event) => {
-			this.updateSocketState('socket.onclose');
-			this.logger.log('Socket closed');
+			this.logger.log('Event: Socket closed');
 		};
 
 		this.socket.onopen = (event) => {
-			this.updateSocketState('socket.onopen');
-			this.logger.log('Socket opened');
+			this.logger.log('Event: Socket opened');
 		};
 	};
 
 	Conn.prototype.checkConnection = function checkConnection() {
-		if (this.socket.readyState === WebSocket.CLOSED) {
-			this.updateSocketState('WebSocket.CLOSED');
-			this.logger.log('Socket CLOSED, reconnecting...');
+		const state = this.socket.readyState;
+		const socketStateDurationMs = this.updateSocketState(state);
+		if (state === WebSocket.CLOSED) {
+			this.logger.log('Socket state: CLOSED, reconnecting...');
 			this.setupSocket();
-		} else if (this.socket.readyState === WebSocket.CLOSING) {
-			// Should not last for long, if it does we ought to close it.
-			const socketStateDurationMs = this.updateSocketState('WebSocket.CLOSING');
+		} else if (state === WebSocket.CLOSING) {
+			this.logger.log('Socket state: CLOSING for '+socketStateDurationMs+' ms');
 			if (socketStateDurationMs > SOCKET_TIMEOUT_MS) {
-				this.socket.close();
+				this.socketIsStuck()
 			}
-			this.logger.log('Socket CLOSING');
-		} else if (this.socket.readyState === WebSocket.CONNECTING) {
-			// Should not last for long, if it does we ought to close it.
-			const socketStateDurationMs = this.updateSocketState('WebSocket.CONNECTING');
+		} else if (state === WebSocket.CONNECTING) {
+			this.logger.log('Socket state: CONNECTING for '+socketStateDurationMs+' ms');
 			if (socketStateDurationMs > SOCKET_TIMEOUT_MS) {
-				this.socket.close();
+				this.socketIsStuck();
 			}
-			this.logger.log('Socket CONNECTING');
 		}
 
 		setTimeout(() => { this.checkConnection(); }, 2000);
 	};
 
+	Conn.prototype.socketIsStuck = function socketIsStuck() {
+		this.logger.log('Socket seems to be stuck, reconnecting...');
+		this.socket.close();
+		this.setupSocket();
+	}
 
 	Conn.prototype.send = function send(payload) {
 		if (this.socket.readyState !== WebSocket.OPEN) {
