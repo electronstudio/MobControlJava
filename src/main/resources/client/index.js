@@ -31,3 +31,15 @@ window.addEventListener('resize', (ev) => {
 	showElement(setPageElement, portrait);
 	showElement(padPageElement, !portrait);
 });
+
+
+if('standalone' in window.navigator){
+	if(window.navigator.standalone){
+		logger.log("IOS standalone")
+	}else{
+		logger.log("IOS not standalone")
+		alert("For best performance please press the share button at the centre bottom of the screen and select 'add to homescreen' from the menu.")
+	}
+}
+
+
