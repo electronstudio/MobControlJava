@@ -19,19 +19,26 @@ const conn = new Conn(logger);
 const padPage = new PadPage(conn, logger);
 export default padPage;
 
+function show(){
+	const width = pageContainer.scrollWidth;
+	const height = pageContainer.scrollHeight;
+	const portrait = width < height;
+	showElement(setPageElement, portrait);
+	showElement(padPageElement, !portrait);
+}
+
 function showElement(element, show) {
 	element.style.opacity = show ? '1' : '0';
 	element.style.pointerEvents = show ? 'auto' : 'none';
 }
 
 window.addEventListener('resize', (ev) => {
-	const width = pageContainer.scrollWidth;
-	const height = pageContainer.scrollHeight;
-	const portrait = width < height;
-	showElement(setPageElement, portrait);
-	showElement(padPageElement, !portrait);
+	show();
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+	show();
+}, false);
 
 if('standalone' in window.navigator){
 	if(window.navigator.standalone){
