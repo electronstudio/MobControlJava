@@ -67,12 +67,12 @@ export default (function iife() {
 			this.logger.log('Socket state: CLOSED, reconnecting...');
 			this.setupSocket();
 		} else if (state === WebSocket.CLOSING) {
-			this.logger.log('Socket state: CLOSING for '+socketStateDurationMs+' ms');
+			this.logger.log(`Socket state: CLOSING for ${socketStateDurationMs} ms`);
 			if (socketStateDurationMs > SOCKET_TIMEOUT_MS) {
-				this.socketIsStuck()
+				this.socketIsStuck();
 			}
 		} else if (state === WebSocket.CONNECTING) {
-			this.logger.log('Socket state: CONNECTING for '+socketStateDurationMs+' ms');
+			this.logger.log(`Socket state: CONNECTING for ${socketStateDurationMs} ms`);
 			if (socketStateDurationMs > SOCKET_TIMEOUT_MS) {
 				this.socketIsStuck();
 			}
@@ -85,7 +85,7 @@ export default (function iife() {
 		this.logger.log('Socket seems to be stuck, reconnecting...');
 		this.socket.close();
 		this.setupSocket();
-	}
+	};
 
 	Conn.prototype.send = function send(payload) {
 		if (this.socket.readyState !== WebSocket.OPEN) {
