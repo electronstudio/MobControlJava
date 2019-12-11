@@ -1,5 +1,8 @@
 <html>
 <head>
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
 	<link rel="manifest" href="manifest.json">
 	<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
@@ -54,6 +57,7 @@
 			display: flex;
 			background-color: black;
 			color: white;
+			flex-direction: column;
 		}
 
 		#padPage {
@@ -62,6 +66,10 @@
 
 		#sectionCanvas:focus {
 			outline: none;
+		}
+
+		#log {
+			font-size: 10;
 		}
 
 		#notification {
@@ -77,14 +85,115 @@
 			filter: drop-shadow(0 0 0.75rem black);
 			/* display: none; */
 		}
+
+		.spacer {
+			height: 30px;
+		}
+
+		.colour-select {
+			width: 40px;
+			height: 40px;
+			border-radius: 2px;
+			margin: 2px;
+			filter: drop-shadow(0 0 0.075rem black);
+		}
 	</style>
 
 </head>
 	<body>
 		<div id="pageContainer" class="guide vStretch">
-			<div id="setPage" class="follower">
-				This is the settings page. Flip to landscape to show the pad.sdss
+			<!--
+				####################################################################################
+				#
+				#   Settings Page
+				#
+				####################################################################################
+			-->
+			<div id="setPage" class="follower bg-dark">
+				<div class="container" style="display: block;">
+					<p class="lead" style="opacity: 30%;">This is the settings page. Flip to landscape to show the pad.</p>
+
+					<div class="col-md-8 order-md-1">
+							<div class="spacer"></div>
+							<div class="row">
+								<label for="username">What's your name?</label>
+								<div class="input-group">
+									<input type="text" class="form-control" placeholder="Player">
+									<div class="input-group-append">
+										<button type="submit" class="btn btn-secondary">Set</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="spacer"></div>
+
+							<div class="row">
+								<label for="username">Primary colour</label>
+								<div class="input-group">
+									<input type="text" class="form-control" placeholder="" style="background-color: YELLOW;">
+									<div class="input-group-append">
+										<button type="submit" class="btn btn-secondary">Set</button>
+									</div>
+								</div>
+								<div style="display: flex; flex-wrap: wrap;">
+									<div class="colour-select" style="background-color: WHITE"></div>
+									<div class="colour-select" style="background-color: SILVER"></div>
+									<div class="colour-select" style="background-color: GRAY"></div>
+									<div class="colour-select" style="background-color: BLACK"></div>
+									<div class="colour-select" style="background-color: RED"></div>
+									<div class="colour-select" style="background-color: MAROON"></div>
+									<div class="colour-select" style="background-color: YELLOW"></div>
+									<div class="colour-select" style="background-color: OLIVE"></div>
+									<div class="colour-select" style="background-color: LIME"></div>
+									<div class="colour-select" style="background-color: GREEN"></div>
+									<div class="colour-select" style="background-color: AQUA"></div>
+									<div class="colour-select" style="background-color: TEAL"></div>
+									<div class="colour-select" style="background-color: BLUE"></div>
+									<div class="colour-select" style="background-color: NAVY"></div>
+									<div class="colour-select" style="background-color: FUCHSIA"></div>
+									<div class="colour-select" style="background-color: PURPLE"></div>
+								</div>
+							</div>
+
+							<div class="spacer"></div>
+
+							<div class="row">
+								<label for="username">Secondary colour</label>
+								<div class="input-group">
+									<input type="text" class="form-control" placeholder="" style="background-color: NAVY;">
+									<div class="input-group-append">
+										<button type="submit" class="btn btn-secondary">Set</button>
+									</div>
+								</div>
+								<div style="display: flex; flex-wrap: wrap;">
+									<div class="colour-select" style="background-color: WHITE"></div>
+									<div class="colour-select" style="background-color: SILVER"></div>
+									<div class="colour-select" style="background-color: GRAY"></div>
+									<div class="colour-select" style="background-color: BLACK"></div>
+									<div class="colour-select" style="background-color: RED"></div>
+									<div class="colour-select" style="background-color: MAROON"></div>
+									<div class="colour-select" style="background-color: YELLOW"></div>
+									<div class="colour-select" style="background-color: OLIVE"></div>
+									<div class="colour-select" style="background-color: LIME"></div>
+									<div class="colour-select" style="background-color: GREEN"></div>
+									<div class="colour-select" style="background-color: AQUA"></div>
+									<div class="colour-select" style="background-color: TEAL"></div>
+									<div class="colour-select" style="background-color: BLUE"></div>
+									<div class="colour-select" style="background-color: NAVY"></div>
+									<div class="colour-select" style="background-color: FUCHSIA"></div>
+									<div class="colour-select" style="background-color: PURPLE"></div>
+								</div>
+							</div>
+					</div>
+				</div>
 			</div>
+			<!--
+				####################################################################################
+				#
+				#   Pad Page
+				#
+				####################################################################################
+			-->
 			<div id="padPage" class="follower">
 				<div id="canvasGuide" class="guide">
 					<canvas id="sectionCanvas" class="canvas follower"></canvas>
@@ -94,8 +203,17 @@
 				<!-- Uncomment the element below to enable log view -->
 				<textarea id="log" class="vStretch"></textarea>
 			</div>
+			<!--
+				####################################################################################
+				#
+				#   Notification Page
+				#
+				####################################################################################
+			-->
 			<div id="notification" class="">
 			</div>
+
+
 		</div>
 	</body>
 </html>
