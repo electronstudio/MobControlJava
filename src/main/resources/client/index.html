@@ -63,13 +63,27 @@
 		#sectionCanvas:focus {
 			outline: none;
 		}
+
+		#notification {
+			position: absolute;
+			width: 100%;
+			height: auto;
+			background-color: orange;
+			color: black;
+			padding-top: 20;
+			padding-bottom: 20;
+			font-family: helvetica;
+			font-weight: bold;
+			filter: drop-shadow(0 0 0.75rem black);
+			/* display: none; */
+		}
 	</style>
 
 </head>
 	<body>
 		<div id="pageContainer" class="guide vStretch">
 			<div id="setPage" class="follower">
-				This is the settings page. Flip to landscape to show the pad.
+				This is the settings page. Flip to landscape to show the pad.sdss
 			</div>
 			<div id="padPage" class="follower">
 				<div id="canvasGuide" class="guide">
@@ -79,6 +93,8 @@
 				</div>
 				<!-- Uncomment the element below to enable log view -->
 				<textarea id="log" class="vStretch"></textarea>
+			</div>
+			<div id="notification" class="">
 			</div>
 		</div>
 	</body>

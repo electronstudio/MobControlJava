@@ -57,6 +57,7 @@ export default (function iife() {
 
 		this.socket.onopen = (event) => {
 			this.logger.log('Event: Socket opened');
+			this.logger.clearNotification();
 		};
 	};
 
@@ -64,15 +65,15 @@ export default (function iife() {
 		const state = this.socket.readyState;
 		const socketStateDurationMs = this.updateSocketState(state);
 		if (state === WebSocket.CLOSED) {
-			this.logger.log('Socket state: CLOSED, reconnecting...');
+			this.logger.logAndNotify('Socket state: CLOSED, reconnecting...');
 			this.setupSocket();
 		} else if (state === WebSocket.CLOSING) {
-			this.logger.log(`Socket state: CLOSING for ${socketStateDurationMs} ms`);
+			this.logger.logAndNotify(`Socket state: CLOSING for ${socketStateDurationMs} ms`);
 			if (socketStateDurationMs > SOCKET_TIMEOUT_MS) {
 				this.socketIsStuck();
 			}
 		} else if (state === WebSocket.CONNECTING) {
-			this.logger.log(`Socket state: CONNECTING for ${socketStateDurationMs} ms`);
+			this.logger.logAndNotify(`Socket state: CONNECTING for ${socketStateDurationMs} ms`);
 			if (socketStateDurationMs > SOCKET_TIMEOUT_MS) {
 				this.socketIsStuck();
 			}

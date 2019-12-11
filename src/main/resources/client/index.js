@@ -13,7 +13,8 @@ const pageContainer = document.getElementById('pageContainer');
 const padPageElement = document.getElementById('padPage');
 const setPageElement = document.getElementById('setPage');
 const logElement = document.getElementById('log');
-const logger = new Logger(logElement);
+const notificationElement = document.getElementById('notification');
+const logger = new Logger(logElement, notificationElement);
 
 const conn = new Conn(logger);
 const padPage = new PadPage(conn, logger);
