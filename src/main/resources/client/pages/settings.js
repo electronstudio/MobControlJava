@@ -28,6 +28,7 @@ export default class SettingsPage {
 		this.initName();
 		this.initColour(1);
 		this.initColour(2);
+		this.initStickSensitivity();
 	}
 
 	initName() {
@@ -60,6 +61,14 @@ export default class SettingsPage {
 		});
 	}
 
+	initStickSensitivity() {
+		const slider = document.getElementById('stickSensitivity');
+		slider.oninput = (ev) => {
+			const sensitivity = ev.target.value / 100;
+			this.sendEventChangeSensitivity(sensitivity);
+		};
+	}
+
 	sendEventChangeName(name) {
 		this.conn.send({
 			__type__: 'change_name',
@@ -71,6 +80,13 @@ export default class SettingsPage {
 		this.conn.send({
 			__type__: `change_colour_${index}`,
 			colour,
+		});
+	}
+
+	sendEventChangeSensitivity(sensitivity) {
+		this.conn.send({
+			__type__: 'set_sensitivity',
+			sensitivity,
 		});
 	}
 }
