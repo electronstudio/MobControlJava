@@ -20,7 +20,12 @@ const conn = new Conn(logger);
 const padPage = new PadPage(conn, logger);
 export default padPage;
 
-function show(){
+function showElement(element, visible) {
+	element.style.opacity = visible ? '1' : '0';
+	element.style.pointerEvents = visible ? 'auto' : 'none';
+}
+
+function show() {
 	const width = pageContainer.scrollWidth;
 	const height = pageContainer.scrollHeight;
 	const portrait = width < height;
@@ -28,26 +33,19 @@ function show(){
 	showElement(padPageElement, !portrait);
 }
 
-function showElement(element, show) {
-	element.style.opacity = show ? '1' : '0';
-	element.style.pointerEvents = show ? 'auto' : 'none';
-}
-
 window.addEventListener('resize', (ev) => {
 	show();
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
 	show();
 }, false);
 
-if('standalone' in window.navigator){
-	if(window.navigator.standalone){
-		logger.log("IOS standalone")
-	}else{
-		logger.log("IOS not standalone")
-		alert("For best performance please press the share button at the centre bottom of the screen and select 'add to homescreen' from the menu.")
+if ('standalone' in window.navigator) {
+	if (window.navigator.standalone) {
+		logger.log('IOS standalone');
+	} else {
+		logger.log('IOS not standalone');
+		alert("For best performance please press the share button at the centre bottom of the screen and select 'add to homescreen' from the menu.");
 	}
 }
-
-
