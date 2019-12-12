@@ -35,7 +35,7 @@ export default class SettingsPage {
 		const nameInput = document.getElementById('name');
 		nameInput.oninput = (ev) => {
 			const name = ev.target.value;
-			this.sendEventChangeName(name);
+			this.sendEventSetName(name);
 		};
 	}
 
@@ -56,7 +56,7 @@ export default class SettingsPage {
 			selectButton.onclick = () => {
 				const color = selectButton.style['background-color'];
 				swatch.style['background-color'] = color;
-				this.sendEventChangeColour(index, color);
+				this.sendEventSetColour(index, color);
 			};
 		});
 	}
@@ -65,25 +65,25 @@ export default class SettingsPage {
 		const slider = document.getElementById('stickSensitivity');
 		slider.oninput = (ev) => {
 			const sensitivity = ev.target.value / 100;
-			this.sendEventChangeSensitivity(sensitivity);
+			this.sendEventSetSensitivity(sensitivity);
 		};
 	}
 
-	sendEventChangeName(name) {
+	sendEventSetName(name) {
 		this.conn.send({
-			__type__: 'change_name',
+			__type__: 'set_name',
 			name,
 		});
 	}
 
-	sendEventChangeColour(index, colour) {
+	sendEventSetColour(index, colour) {
 		this.conn.send({
-			__type__: `change_colour_${index}`,
+			__type__: `set_colour_${index}`,
 			colour,
 		});
 	}
 
-	sendEventChangeSensitivity(sensitivity) {
+	sendEventSetSensitivity(sensitivity) {
 		this.conn.send({
 			__type__: 'set_sensitivity',
 			sensitivity,
