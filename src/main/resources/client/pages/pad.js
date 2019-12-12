@@ -25,8 +25,8 @@ export default (function iife() {
 			return image;
 		}
 
-		const sectionImage = getImage('./pads/1/section.png', redraw);
-		const graphicImage = getImage('./pads/1/graphic.svg', redraw);
+		const sectionImage = getImage('./pads/1/section.png', () => { redraw(); });
+		const graphicImage = getImage('./pads/1/graphic.svg', () => { redraw(); });
 
 		//
 		// Initialise utilities.
@@ -37,30 +37,30 @@ export default (function iife() {
 		const overlayCanvasImage = new CanvasImage(overlayCanvas, null);
 		const canvasImages = [sectionCanvasImage, graphicCanvasImage, overlayCanvasImage];
 
-		const padState = new PadState(sectionCanvasImage);
+		this.padState = new PadState(sectionCanvasImage);
 
 		//
 		// Redraw.
 		//
-		function redrawBase() {
+		const redrawBase = () => {
 			canvasImages.forEach((canvasImage) => {
 				canvasImage.alignWithElement(canvasGuide);
 				canvasImage.drawImage();
 			});
 
 			// Initialise bounding boxes based on what we've drawn.
-			padState.initAxisBoundingBoxes();
-		}
+			this.padState.initAxisBoundingBoxes();
+		};
 
-		function redrawOverlay() {
+		const redrawOverlay = () => {
 			overlayCanvasImage.clear();
 
 			// Draw very faint bounding boxes.
-			padState.getAxisBoundingBoxes().forEach((boundingBox) => {
+			this.padState.getAxisBoundingBoxes().forEach((boundingBox) => {
 				overlayCanvasImage.drawBoundingBox({ boundingBox, lineWidth: 2, fillColour: 'rgba(0,0,0,0.0)', outlineWidth: 'rgba(0,0,0,0.02)' });
 			});
 
-			padState.getActivePointerInfos().forEach((pointerInfo) => {
+			this.padState.getActivePointerInfos().forEach((pointerInfo) => {
 				// Derive dimensions relative to the screen resolution.
 				const windowHeight = graphicCanvasImage.getSize().h;
 				const bigRadius = Math.floor(windowHeight * 0.2);
@@ -91,12 +91,12 @@ export default (function iife() {
 					}
 				}
 			});
-		}
+		};
 
-		function redraw() {
+		const redraw = () => {
 			redrawBase();
 			redrawOverlay();
-		}
+		};
 
 		window.addEventListener('resize', () => {
 			redraw();
@@ -109,7 +109,7 @@ export default (function iife() {
 		let lastPayload = null;
 
 		const sendState = () => {
-			const deltaState = padState.flushState();
+			const deltaState = this.padState.flushState();
 			const thisPayload = JSON.stringify(deltaState, null, 4);
 			if (lastPayload !== thisPayload) {
 				lastPayload = thisPayload;
@@ -137,23 +137,27 @@ export default (function iife() {
 		// React to user interaction.
 		//
 		sectionCanvas.onpointerdown = (ev) => {
-			padState.onPointerDown(ev.pointerId, ev.clientX, ev.clientY);
+			this.padState.onPointerDown(ev.pointerId, ev.clientX, ev.clientY);
 			redrawOverlay();
 			sendState();
 		};
 
 		sectionCanvas.onpointermove = (ev) => {
-			padState.onPointerMove(ev.pointerId, ev.clientX, ev.clientY);
+			this.padState.onPointerMove(ev.pointerId, ev.clientX, ev.clientY);
 			redrawOverlay();
 			sendState();
 		};
 
 		sectionCanvas.onpointerup = (ev) => {
-			padState.onPointerUp(ev.pointerId);
+			this.padState.onPointerUp(ev.pointerId);
 			redrawOverlay();
 			sendState();
 		};
 	}
+
+	PadPage.prototype.getPadState = function getPadState() {
+		return this.padState;
+	};
 
 	return PadPage;
 }());
