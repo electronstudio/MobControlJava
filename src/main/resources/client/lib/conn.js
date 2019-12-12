@@ -1,4 +1,4 @@
-const SOCKET_TIMEOUT_MS = 5 * 1000;
+const SOCKET_TIMEOUT_MS = 10 * 1000;
 
 export default (function iife() {
 	function Conn(logger) {
