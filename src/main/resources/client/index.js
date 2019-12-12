@@ -37,6 +37,10 @@ window.addEventListener('resize', (ev) => {
 	show();
 });
 
+window.addEventListener('touchstart', (ev) => {
+	document.body.requestFullscreen();
+});
+
 document.addEventListener('DOMContentLoaded', function() {
 	show();
 }, false);
