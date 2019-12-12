@@ -13,7 +13,8 @@ export default (function iife() {
 	 *
 	 */
 
-	const AXIS2D_EXTENT_RADIUS = 20;
+	const AXIS2D_EXTENT_RADIUS_MIN = 20;
+	const AXIS2D_EXTENT_RADIUS_MAX = 200;
 
 	/**
 	 *
@@ -248,6 +249,10 @@ export default (function iife() {
 	 *
 	 */
 
+	function lerp(min, max, weight) {
+		return min + ((max - min) * weight);
+	}
+
 	PadState.prototype.onPointerDown = function onPointerDown(pointer, absX, absY) {
 		// Get associated input.
 		const rgba = this.sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
@@ -256,10 +261,12 @@ export default (function iife() {
 
 		if (input) {
 			// Update pointer cache.
+			const extentRadius = lerp(AXIS2D_EXTENT_RADIUS_MIN, AXIS2D_EXTENT_RADIUS_MAX, 1 - this.analogStickSensitivity);
+
 			this.activePointerInfoMap[pointer] = {
 				input,
 				downPosition: { absX, absY },
-				extentRadius: inputType === 'axis2D' && AXIS2D_EXTENT_RADIUS,
+				extentRadius: inputType === 'axis2D' && extentRadius,
 			};
 
 			// Update state.

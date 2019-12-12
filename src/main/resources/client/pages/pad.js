@@ -71,6 +71,7 @@ export default (function iife() {
 				// Main colours.
 				const fillColour = 'rgba(0,0,255,0.7)';
 				const outlineColour = 'rgba(0,0,0,0.8)';
+				const extentColour = 'rgba(255,0,0,0.3)';
 
 				const { downPosition, movePosition, extentRadius } = pointerInfo;
 
@@ -88,6 +89,9 @@ export default (function iife() {
 
 						// Draw a circle where the pointer has moved to. (With thin outline.)
 						overlayCanvasImage.drawCircle({ x: movePosition.absX, y: movePosition.absY, r: bigRadius, fillColour, outlineColour, outlineWidth: thinWidth });
+
+						// Draw the axis-bounds. This shows the effect of changing the analogue stick sensitivity.
+						overlayCanvasImage.drawCircle({ x: downPosition.absX, y: downPosition.absY, r: extentRadius, fillColour: extentColour, outlineColour, outlineWidth: thinWidth });
 					}
 				}
 			});
