@@ -19,7 +19,7 @@ const logger = new Logger(logElement, notificationElement);
 
 const conn = new Conn(logger);
 const padPage = new PadPage(conn, logger);
-const settingsPage = new SettingsPage(conn, logger);
+const settingsPage = new SettingsPage(conn, padPage);
 
 export default {
 	settingsPage,

@@ -23,12 +23,13 @@ const selectableColours = [
 ];
 
 export default class SettingsPage {
-	constructor(conn) {
+	constructor(conn, padPage) {
 		this.conn = conn;
 		this.initName();
 		this.initColour(1);
 		this.initColour(2);
 		this.initStickSensitivity();
+		this.padPage = padPage;
 	}
 
 	initName() {
@@ -63,6 +64,10 @@ export default class SettingsPage {
 
 	initStickSensitivity() {
 		const slider = document.getElementById('stickSensitivity');
+		const padState = this.padPage.getPadState();
+		const initialSensitivity = padState.getAnalogStickSensitivity();
+		slider.value = initialSensitivity * 100;
+
 		slider.oninput = (ev) => {
 			const sensitivity = ev.target.value / 100;
 			this.sendEventSetSensitivity(sensitivity);
@@ -84,9 +89,7 @@ export default class SettingsPage {
 	}
 
 	sendEventSetSensitivity(sensitivity) {
-		this.conn.send({
-			__type__: 'set_sensitivity',
-			sensitivity,
-		});
+		const padState = this.padPage.getPadState();
+		padState.setAnalogStickSensitivity(sensitivity);
 	}
 }

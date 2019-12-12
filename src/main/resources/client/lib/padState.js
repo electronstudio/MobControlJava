@@ -102,6 +102,7 @@ export default (function iife() {
 		this.colourBoundingBoxes = {};                  // Bounding box for each hitbox.
 		this.activePointerInfoMap = {};                 // Metadata for each currently-active pointer.
 		this.deltaState = {};                           // Changes made to the pad state, since the last call to flushDeltaState().
+		this.analogStickSensitivity = 0.8;
 		/* eslint-enable no-multi-spaces */
 
 		this.resetState();
@@ -309,6 +310,14 @@ export default (function iife() {
 			const partialState = handler.reset(input);
 			this.setState(partialState);
 		}
+	};
+
+	PadState.prototype.getAnalogStickSensitivity = function getAnalogStickSensitivity() {
+		return this.analogStickSensitivity;
+	};
+
+	PadState.prototype.setAnalogStickSensitivity = function setAnalogStickSensitivity(analogStickSensitivity) {
+		this.analogStickSensitivity = analogStickSensitivity;
 	};
 
 	return PadState;
