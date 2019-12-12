@@ -5,6 +5,7 @@
  * Transmits internal representation to server on regular intervals.
  */
 
+import SettingsPage from './pages/settings.js';
 import PadPage from './pages/pad.js';
 import Conn from './lib/conn.js';
 import Logger from './lib/logger.js';
@@ -18,7 +19,12 @@ const logger = new Logger(logElement, notificationElement);
 
 const conn = new Conn(logger);
 const padPage = new PadPage(conn, logger);
-export default padPage;
+const settingsPage = new SettingsPage(conn, logger);
+
+export default {
+	settingsPage,
+	padPage,
+};
 
 function showElement(element, visible) {
 	element.style.opacity = visible ? '1' : '0';

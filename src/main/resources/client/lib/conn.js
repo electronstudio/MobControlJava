@@ -92,6 +92,7 @@ export default (function iife() {
 		if (this.socket.readyState !== WebSocket.OPEN) {
 			this.logger.log(`WARNING: sending to closed socket. bufferedamount: ${this.socket.bufferedAmount}`);
 		}
+		console.log(payload);
 		this.socket.send(payload);
 	};
 

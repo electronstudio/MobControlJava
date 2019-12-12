@@ -9,6 +9,7 @@ module.exports = {
 	"extends": "airbnb",
 	"rules": {
 		"no-param-reassign": [2, { "props": false }],
+		"no-console": 0,
 		"no-alert": 0,
 		"import/extensions": 0,
 		"object-curly-newline": 0,
