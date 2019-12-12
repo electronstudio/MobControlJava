@@ -13,7 +13,7 @@ export default (function iife() {
 	 *
 	 */
 
-	const AXIS2D_EXTENT_RADIUS_MIN = 20;
+	const AXIS2D_EXTENT_RADIUS_MIN = 1;
 	const AXIS2D_EXTENT_RADIUS_MAX = 200;
 
 	/**
