@@ -37,6 +37,7 @@ export default (function iife() {
 
 		this.updateSocketState(null);
 
+		this.logger.logAndNotify("Connecting...");
 		this.socket = new WebSocket(this.url);
 
 		this.socket.onmessage = (event) => {
@@ -57,29 +58,31 @@ export default (function iife() {
 
 		this.socket.onopen = (event) => {
 			this.logger.log('Event: Socket opened');
-			this.logger.clearNotification();
+			this.logger.logAndNotify("Connected!");
 		};
 	};
 
 	Conn.prototype.checkConnection = function checkConnection() {
 		const state = this.socket.readyState;
 		const socketStateDurationMs = this.updateSocketState(state);
-		if (state === WebSocket.CLOSED) {
+		if (state == WebSocket.OPEN) {
+			this.logger.clearNotification();
+		} else if (state === WebSocket.CLOSED) {
 			this.logger.logAndNotify('Socket state: CLOSED, reconnecting...');
 			this.setupSocket();
 		} else if (state === WebSocket.CLOSING) {
-			this.logger.logAndNotify(`Socket state: CLOSING for ${socketStateDurationMs} ms`);
+			this.logger.logAndNotify(`Socket state: CLOSING for ${Math.round(socketStateDurationMs/1000)} s`);
 			if (socketStateDurationMs > SOCKET_TIMEOUT_MS) {
 				this.socketIsStuck();
 			}
 		} else if (state === WebSocket.CONNECTING) {
-			this.logger.logAndNotify(`Socket state: CONNECTING for ${socketStateDurationMs} ms`);
+			this.logger.logAndNotify(`Socket state: CONNECTING for ${Math.round(socketStateDurationMs/1000)} s`);
 			if (socketStateDurationMs > SOCKET_TIMEOUT_MS) {
 				this.socketIsStuck();
 			}
 		}
 
-		setTimeout(() => { this.checkConnection(); }, 2000);
+		setTimeout(() => { this.checkConnection(); }, 1000);
 	};
 
 	Conn.prototype.socketIsStuck = function socketIsStuck() {

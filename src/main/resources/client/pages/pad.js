@@ -24,9 +24,17 @@ export default (function iife() {
 			image.src = imageSrc;
 			return image;
 		}
+		this.logger.logAndNotify("Loading layout 1");
+		const sectionImage = getImage('./pads/1/section.png', () => {
+			redraw();
+			this.logger.logAndNotify("Layout 1 loaded");
+		});
+		this.logger.logAndNotify("Loading graphic 1");
+		const graphicImage = getImage('./pads/1/graphic.svg', () => {
+			redraw();
+			this.logger.logAndNotify("Graphic 1 loaded");
+		});
 
-		const sectionImage = getImage('./pads/1/section.png', () => { redraw(); });
-		const graphicImage = getImage('./pads/1/graphic.svg', () => { redraw(); });
 
 		//
 		// Initialise utilities.
