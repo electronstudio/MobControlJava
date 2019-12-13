@@ -32,8 +32,13 @@ function showElement(element, visible) {
 }
 
 function show() {
-	const width = pageContainer.scrollWidth;
-	const height = pageContainer.scrollHeight;
+	const width = window.innerWidth
+		|| document.documentElement.clientWidth
+		|| document.body.clientWidth;
+
+	const height = window.innerHeight
+		|| document.documentElement.clientHeight
+		|| document.body.clientHeight;
 	const portrait = width < height;
 	showElement(setPageElement, portrait);
 	showElement(padPageElement, !portrait);
