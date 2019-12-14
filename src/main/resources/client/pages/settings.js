@@ -3,23 +3,22 @@
  */
 
 const selectableColours = [
-	// TODO: Replace with hex, or whichever format is required.
-	'WHITE',
-	'SILVER',
-	'GRAY',
-	'BLACK',
-	'RED',
-	'MAROON',
-	'YELLOW',
-	'OLIVE',
-	'LIME',
-	'GREEN',
-	'AQUA',
-	'TEAL',
-	'BLUE',
-	'NAVY',
-	'FUCHSIA',
-	'PURPLE',
+	'#000000',
+	'#493c2b',
+	'#be2633',
+	'#e06f8b',
+	'#9d9d9d',
+	'#a46422',
+	'#eb8931',
+	'#f7e26b',
+	'#ffffff',
+	'#1b2632',
+	'#2f484e',
+	'#44891a',
+	'#a3ce27',
+	'#005784',
+	'#31a2f2',
+	'#b2dcef'
 ];
 
 export default class SettingsPage {
