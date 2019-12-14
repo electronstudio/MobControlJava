@@ -75,17 +75,21 @@ export default class SettingsPage {
 	}
 
 	sendEventSetName(name) {
-		this.conn.send({
+		const data = {
 			__type__: 'set_name',
 			name,
-		});
+		};
+		const json = JSON.stringify(data, null, 4);
+		this.conn.send(json);
 	}
 
 	sendEventSetColour(index, colour) {
-		this.conn.send({
+		const data = {
 			__type__: `set_colour_${index}`,
 			colour,
-		});
+		};
+		const json = JSON.stringify(data, null, 4);
+		this.conn.send(json);
 	}
 
 	sendEventSetSensitivity(sensitivity) {
