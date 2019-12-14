@@ -38,13 +38,39 @@ public class WebSocket extends WebSocketAdapter {
         //System.out.println(controller + " Received TEXT message: " + message);
         JsonValue fromJson = new JsonReader().parse(message);
 
+
+        String type = fromJson.getString("__type__", "");
+        System.out.println("type: "+type);
+        switch (type) {
+            case "set_name":
+                String name = fromJson.getString("name");
+                System.out.println("name: " + name);
+                break;
+            case "set_colour_1":
+                String c1 = fromJson.getString("colour");
+                System.out.println("c1: " + c1);
+                break;
+            case "set_colour_2":
+                String c2 = fromJson.getString("colour");
+                System.out.println("c2: " + c2);
+                break;
+            default:
+                //System.out.println("padupdate");
+                padUpdate(fromJson);
+                break;
+        }
+
+
+    }
+
+    private void padUpdate(JsonValue fromJson) {
         for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
-            if(fromJson.has(buttonNames[i])) {
+            if (fromJson.has(buttonNames[i])) {
                 controllerButtons.set(i, fromJson.getBoolean(buttonNames[i]));
             }
         }
         for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++) {
-            if(fromJson.has(axisNames[i])) {
+            if (fromJson.has(axisNames[i])) {
                 controllerAxis.set(i, fromJson.getFloat(axisNames[i]));
             }
         }
@@ -64,12 +90,12 @@ public class WebSocket extends WebSocketAdapter {
         cause.printStackTrace(System.err);
     }
 
-    public void sendRumble(float leftMagnitude, float rightMagnitude, int duration_ms){
-        String json = "{ \"header\": \"vibrate\", \"data\": { \"mag_left\": "+leftMagnitude+", \"mag_right\": "+rightMagnitude+", \"duration_ms\": "+duration_ms+" } }";
+    public void sendRumble(float leftMagnitude, float rightMagnitude, int duration_ms) {
+        String json = "{ \"header\": \"vibrate\", \"data\": { \"mag_left\": " + leftMagnitude + ", \"mag_right\": " + rightMagnitude + ", \"duration_ms\": " + duration_ms + " } }";
         System.out.println(json);
         try {
             RemoteEndpoint remote = getRemote();
-            if(remote!=null) {
+            if (remote != null) {
                 remote.sendString(json);
                 getRemote().flush();
             }

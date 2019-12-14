@@ -54,6 +54,7 @@ public class HttpServer {
         servletHandler.setStopTimeout(3000);
         servletHandler.getSessionHandler().setMaxInactiveInterval(3);
 
+
         URL webRootLocation = this.getClass().getResource("/client/index.html");
         if (webRootLocation == null) {
             throw new IllegalStateException("Unable to determine webroot URL location");
