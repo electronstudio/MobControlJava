@@ -20,9 +20,9 @@ public class WebSocket extends WebSocketAdapter {
     final AtomicReferenceArray<Float> controllerAxis = new AtomicReferenceArray<>(SDL_CONTROLLER_AXIS_MAX);
     final AtomicReferenceArray<Boolean> controllerButtons = new AtomicReferenceArray<>(SDL_CONTROLLER_BUTTON_MAX);
 
-    volatile Color colour1;
-    volatile Color colour2;
-    volatile String playerName;
+    volatile Color colour1 = Color.WHITE;
+    volatile Color colour2 = Color.WHITE;
+    volatile String playerName = "Player";
 
 
     @Override
@@ -47,7 +47,6 @@ public class WebSocket extends WebSocketAdapter {
 
 
         String type = fromJson.getString("__type__", "");
-        System.out.println("type: "+type);
         switch (type) {
             case "set_name":
                 playerName = fromJson.getString("name");
@@ -55,15 +54,12 @@ public class WebSocket extends WebSocketAdapter {
             case "set_colour_1":
                 int[] rgb = fromJson.get("rgb").asIntArray();
                 colour1 = new Color(rgb[0], rgb[1], rgb[2]);
-                System.out.println(colour1.toString());
                 break;
             case "set_colour_2":
                 int[] rgb2 = fromJson.get("rgb").asIntArray();
                 colour2 = new Color(rgb2[0], rgb2[1], rgb2[2]);
-                System.out.println(colour2.toString());
                 break;
             default:
-                //System.out.println("padupdate");
                 padUpdate(fromJson);
                 break;
         }

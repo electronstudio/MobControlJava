@@ -32,14 +32,7 @@ function showElement(element, visible) {
 }
 
 function show() {
-	const width = window.innerWidth
-		|| document.documentElement.clientWidth
-		|| document.body.clientWidth;
-
-	const height = window.innerHeight
-		|| document.documentElement.clientHeight
-		|| document.body.clientHeight;
-	const portrait = width < height;
+	const portrait = window.matchMedia("(orientation: portrait)").matches;
 	showElement(setPageElement, portrait);
 	showElement(padPageElement, !portrait);
 }

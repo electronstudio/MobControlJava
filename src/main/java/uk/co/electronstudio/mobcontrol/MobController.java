@@ -217,13 +217,16 @@ public class MobController implements RumbleController {
     public void close() {
     }
 
+
     public Color getColour1(){
         return webSocket.colour1;
     }
 
+
     public Color getColour2(){
         return webSocket.colour2;
     }
+
 
     public String getPlayerName(){
         return webSocket.playerName;

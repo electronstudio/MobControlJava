@@ -17,7 +17,7 @@ plugins {
 apply plugin: 'com.jfrog.bintray'
 
 group 'uk.co.electronstudio.mobcontrol'
-version '0.1.4'
+version '0.1.7'
 ext.ver = version
 project.ext.mainClassName = "uk.co.electronstudio.mobcontrol.MobTest"
 
