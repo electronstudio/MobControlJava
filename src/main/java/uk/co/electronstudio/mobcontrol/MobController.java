@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import uk.co.electronstudio.sdl2gdx.RumbleController;
 
+import java.awt.*;
+
 
 public class MobController implements RumbleController {
 
@@ -87,6 +89,7 @@ public class MobController implements RumbleController {
     private final boolean[] oldButtonState;
     private final PovDirection[] oldHatState;
     private final static Vector3 zero = new Vector3(0, 0, 0);
+
 
 
     public MobController(MobControllerManager manager, WebSocket webSocket) {
@@ -212,7 +215,18 @@ public class MobController implements RumbleController {
     }
 
     public void close() {
+    }
 
+    public Color getColour1(){
+        return webSocket.colour1;
+    }
+
+    public Color getColour2(){
+        return webSocket.colour2;
+    }
+
+    public String getPlayerName(){
+        return webSocket.playerName;
     }
 
     /**

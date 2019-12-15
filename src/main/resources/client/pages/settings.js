@@ -83,9 +83,10 @@ export default class SettingsPage {
 	}
 
 	sendEventSetColour(index, colour) {
+		const rgb = colour.match(/\d+/g);
 		const data = {
 			__type__: `set_colour_${index}`,
-			colour,
+			rgb,
 		};
 		const json = JSON.stringify(data, null, 4);
 		this.conn.send(json);

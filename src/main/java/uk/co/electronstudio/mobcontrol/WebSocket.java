@@ -6,6 +6,8 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
+import java.awt.*;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import static uk.co.electronstudio.mobcontrol.MobController.*;
@@ -17,6 +19,11 @@ public class WebSocket extends WebSocketAdapter {
 
     final AtomicReferenceArray<Float> controllerAxis = new AtomicReferenceArray<>(SDL_CONTROLLER_AXIS_MAX);
     final AtomicReferenceArray<Boolean> controllerButtons = new AtomicReferenceArray<>(SDL_CONTROLLER_BUTTON_MAX);
+
+    volatile Color colour1;
+    volatile Color colour2;
+    volatile String playerName;
+
 
     @Override
     public void onWebSocketConnect(Session sess) {
@@ -43,16 +50,17 @@ public class WebSocket extends WebSocketAdapter {
         System.out.println("type: "+type);
         switch (type) {
             case "set_name":
-                String name = fromJson.getString("name");
-                System.out.println("name: " + name);
+                playerName = fromJson.getString("name");
                 break;
             case "set_colour_1":
-                String c1 = fromJson.getString("colour");
-                System.out.println("c1: " + c1);
+                int[] rgb = fromJson.get("rgb").asIntArray();
+                colour1 = new Color(rgb[0], rgb[1], rgb[2]);
+                System.out.println(colour1.toString());
                 break;
             case "set_colour_2":
-                String c2 = fromJson.getString("colour");
-                System.out.println("c2: " + c2);
+                int[] rgb2 = fromJson.get("rgb").asIntArray();
+                colour2 = new Color(rgb2[0], rgb2[1], rgb2[2]);
+                System.out.println(colour2.toString());
                 break;
             default:
                 //System.out.println("padupdate");

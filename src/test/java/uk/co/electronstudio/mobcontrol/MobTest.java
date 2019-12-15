@@ -100,7 +100,7 @@ public class MobTest {
     private static SDLInfoPanel[] setup(JTabbedPane tabbedPane, JFrame testFrame) {
         testFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         testFrame.setLocationRelativeTo(null);
-        testFrame.setMinimumSize(new Dimension(1000, 350));
+        testFrame.setMinimumSize(new Dimension(1000, 500));
         testFrame.setResizable(true);
         testFrame.setVisible(true);
 
@@ -144,6 +144,7 @@ public class MobTest {
         private JButton vibrateButton;
         private JLabel titleLabel;
 
+
         public SDLInfoPanel() {
             setLayout(new BorderLayout());
 
@@ -176,6 +177,7 @@ public class MobTest {
 
             add(middlePanel);
             add(vibratePanel, BorderLayout.SOUTH);
+
         }
 
         public void updatePanel(MobController c) {
@@ -185,7 +187,7 @@ public class MobTest {
                 return;
             }
             try {
-                titleLabel.setText(c.getName());
+                titleLabel.setText(c.getName()+" "+c.getPlayerName());
 
                 axes.removeAll();
                 for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++) {
@@ -219,6 +221,15 @@ public class MobTest {
 
                 pov.removeAll();
                 pov.add(new JLabel(c.getPov(0).toString()));
+
+                Color c1 = c.getColour1();
+                if(c1!=null) {
+                    axes.setBackground(c1);
+                }
+                Color c2 = c.getColour2();
+                if(c2!=null) {
+                    pov.setBackground(c2);
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
