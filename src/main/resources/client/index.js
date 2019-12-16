@@ -35,16 +35,19 @@ function showPage(pageId) {
 	currentPage = pageId;
 }
 
-const onSettingsPageRequested = () => {
+const onSettingsPageRequested = (padIndex) => {
+	padPage.initCanvasGraphics(padIndex);
 	showPage(pages.settings);
-};
-
-const onPadPageRequested = () => {
-	showPage(pages.pad);
 };
 
 const conn = new Conn(logger);
 const padPage = new PadPage(conn, logger, onSettingsPageRequested);
+
+const onPadPageRequested = (padIndex) => {
+	padPage.initCanvasGraphics(padIndex);
+	showPage(pages.pad);
+};
+
 const settingsPage = new SettingsPage(conn, padPage, onPadPageRequested);
 
 window.addEventListener('resize', (ev) => {

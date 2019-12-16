@@ -77,10 +77,11 @@ export default class SettingsPage {
 	}
 
 	initShowPadButton() {
-		const showPadButton = document.getElementById('showPadButton');
-		showPadButton.onclick = (ev) => {
-			this.onPadPageRequested();
-		};
+		const showPadButton1 = document.getElementById('showPadButton1');
+		showPadButton1.onclick = (ev) => { this.onPadPageRequested(1); };
+
+		const showPadButton2 = document.getElementById('showPadButton2');
+		showPadButton2.onclick = (ev) => { this.onPadPageRequested(2); };
 	}
 
 	sendEventSetName(name) {
