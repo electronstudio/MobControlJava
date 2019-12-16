@@ -14,7 +14,7 @@
 	<meta name="apple-mobile-web-app-title" content="MobControl">
 	<meta name="msapplication-starturl" content="/">
 	<meta charset='utf-8' />
-	<meta name='viewport' content='user-scalable=no, initial-scale=0.5' />  <!--might also need:  user-scalable=no,   initial-scale=1, shrink-to-fit=no, width=device-width -->
+	<meta name='viewport' content='user-scalable=no, initial-scale=1.0' />  <!--might also need:  user-scalable=no,   initial-scale=1, shrink-to-fit=no, width=device-width -->
 	<meta name="msapplication-TileColor" content="#da532c">
 	<meta name="theme-color" content="#ffffff">
 
@@ -118,14 +118,14 @@
 					<div class="col-md-8 order-md-1">
 						<div class="spacer"></div>
 						<div class="row">
-							<label for="username">What's your name?</label>
+							<label for="name">What's your name?</label>
 							<input type="text" class="form-control" placeholder="Player" id="name">
 						</div>
 
 						<div class="spacer"></div>
 
 						<div class="row">
-							<label for="username">Primary colour</label>
+							<label for="colour1Swatch">Primary colour</label>
 							<input type="text" class="form-control" placeholder="" style="background-color: transparent;" id="colour1Swatch">
 							<div style="display: flex; flex-wrap: wrap;" id="colour1SelectButtons">
 								<div class="colour-select" style="background-color: WHITE"></div>
@@ -135,7 +135,7 @@
 						<div class="spacer"></div>
 
 						<div class="row">
-							<label for="username">Secondary colour</label>
+							<label for="colour2Swatch">Secondary colour</label>
 							<input type="text" class="form-control" placeholder="" style="background-color: transparent;" id="colour2Swatch">
 							<div style="display: flex; flex-wrap: wrap;" id="colour2SelectButtons">
 								<div class="colour-select" style="background-color: WHITE"></div>
@@ -145,14 +145,14 @@
 						<div class="spacer"></div>
 
 						<div class="row">
-							<label for="customRange1">Analogue stick sensitivity</label>
+							<label for="stickSensitivity">Analogue stick sensitivity</label>
 							<input type="range" class="custom-range" id="stickSensitivity">
 						</div>
 
 						<div class="row">
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" value="" id="showLogCheckbox">
-								<label class="form-check-label" for="defaultCheck1">Show Log</label>
+								<label class="form-check-label" for="showLogCheckbox">Show Log</label>
 							</div>
 						</div>
 					</div>
