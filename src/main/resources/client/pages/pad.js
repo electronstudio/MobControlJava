@@ -2,8 +2,8 @@ import CanvasImage from '../lib/canvasImage.js';
 import PadState from '../lib/padState.js';
 import Vibration from '../lib/vibration.js';
 
-export default (function iife() {
-	function PadPage(conn, logger, onSettingsPageRequested) {
+export default class PadPage {
+	constructor(conn, logger, onSettingsPageRequested) {
 		this.conn = conn;
 		this.logger = logger;
 		this.onSettingsPageRequested = onSettingsPageRequested;
@@ -168,9 +168,7 @@ export default (function iife() {
 		};
 	}
 
-	PadPage.prototype.getPadState = function getPadState() {
+	getPadState() {
 		return this.padState;
-	};
-
-	return PadPage;
-}());
+	}
+}
