@@ -32,6 +32,7 @@ export default class SettingsPage {
 		this.initColour(2);
 		this.initStickSensitivity();
 		this.initShowPadButton();
+		this.initShowLogCheckbox();
 	}
 
 	initName() {
@@ -82,6 +83,16 @@ export default class SettingsPage {
 
 		const showPadButton2 = document.getElementById('showPadButton2');
 		showPadButton2.onclick = (ev) => { this.onPadPageRequested(2); };
+	}
+
+	initShowLogCheckbox() {
+		const showLogCheckbox = document.getElementById('showLogCheckbox');
+		const logTextArea = document.getElementById('log');
+
+		showLogCheckbox.oninput = (ev) => {
+			const showLog = ev.target.checked;
+			logTextArea.hidden = !showLog;
+		};
 	}
 
 	sendEventSetName(name) {

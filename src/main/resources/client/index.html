@@ -148,6 +148,13 @@
 							<label for="customRange1">Analogue stick sensitivity</label>
 							<input type="range" class="custom-range" id="stickSensitivity">
 						</div>
+
+						<div class="row">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="" id="showLogCheckbox">
+								<label class="form-check-label" for="defaultCheck1">Show Log</label>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -165,7 +172,7 @@
 					<canvas id="overlayCanvas" class="canvas follower passthrough"></canvas>
 				</div>
 				<!-- Uncomment the element below to enable log view -->
-				<textarea id="log" class="vStretch"></textarea>
+				<textarea hidden="true" id="log" class="vStretch"></textarea>
 			</div>
 			<!--
 				####################################################################################
@@ -176,8 +183,6 @@
 			-->
 			<div id="notification" class="">
 			</div>
-
-
 		</div>
 	</body>
 </html>
