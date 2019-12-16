@@ -10,7 +10,6 @@ import PadPage from './pages/pad.js';
 import Conn from './lib/conn.js';
 import Logger from './lib/logger.js';
 
-const pageContainer = document.getElementById('pageContainer');
 const padPageElement = document.getElementById('padPage');
 const setPageElement = document.getElementById('setPage');
 const logElement = document.getElementById('log');
@@ -32,7 +31,7 @@ function showElement(element, visible) {
 }
 
 function show() {
-	const portrait = window.matchMedia("(orientation: portrait)").matches;
+	const portrait = window.matchMedia('(orientation: portrait)').matches;
 	showElement(setPageElement, portrait);
 	showElement(padPageElement, !portrait);
 }

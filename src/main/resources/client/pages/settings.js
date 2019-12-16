@@ -18,7 +18,7 @@ const selectableColours = [
 	'#a3ce27',
 	'#005784',
 	'#31a2f2',
-	'#b2dcef'
+	'#b2dcef',
 ];
 
 export default class SettingsPage {
