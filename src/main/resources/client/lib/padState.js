@@ -54,6 +54,8 @@ export default (function iife() {
 		},
 	};
 
+	const settingsPageColourString = '0,27,255,255';
+
 	/**
 	 *
 	 * Utils.
@@ -97,13 +99,14 @@ export default (function iife() {
 	 *
 	 */
 
-	function PadState(sectionCanvasImage) {
+	function PadState(sectionCanvasImage, onSettingsPageRequested) {
 		/* eslint-disable no-multi-spaces */
 		this.sectionCanvasImage = sectionCanvasImage;   // Image whose colours define the hitbox of each input.
 		this.colourBoundingBoxes = {};                  // Bounding box for each hitbox.
 		this.activePointerInfoMap = {};                 // Metadata for each currently-active pointer.
 		this.deltaState = {};                           // Changes made to the pad state, since the last call to flushDeltaState().
 		this.analogStickSensitivity = 0.8;
+		this.onSettingsPageRequested = onSettingsPageRequested;
 		/* eslint-enable no-multi-spaces */
 
 		this.resetState();
@@ -256,6 +259,11 @@ export default (function iife() {
 	PadState.prototype.onPointerDown = function onPointerDown(pointer, absX, absY) {
 		// Get associated input.
 		const rgba = this.sectionCanvasImage.getPixels(absX, absY, 1, 1).slice(0, 4);
+		const colourString = rgbaToColourString(rgba);
+		if (colourString === settingsPageColourString) {
+			this.onSettingsPageRequested();
+		}
+
 		const input = this.getInputFromRgba(rgba);
 		const inputType = getInputTypeFromInput(input);
 

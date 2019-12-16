@@ -3,9 +3,10 @@ import PadState from '../lib/padState.js';
 import Vibration from '../lib/vibration.js';
 
 export default (function iife() {
-	function PadPage(conn, logger) {
+	function PadPage(conn, logger, onSettingsPageRequested) {
 		this.conn = conn;
 		this.logger = logger;
+		this.onSettingsPageRequested = onSettingsPageRequested;
 
 		//
 		// Get HTML elements.
@@ -45,7 +46,7 @@ export default (function iife() {
 		const overlayCanvasImage = new CanvasImage(overlayCanvas, null);
 		const canvasImages = [sectionCanvasImage, graphicCanvasImage, overlayCanvasImage];
 
-		this.padState = new PadState(sectionCanvasImage);
+		this.padState = new PadState(sectionCanvasImage, onSettingsPageRequested);
 
 		//
 		// Redraw.

@@ -22,13 +22,16 @@ const selectableColours = [
 ];
 
 export default class SettingsPage {
-	constructor(conn, padPage) {
+	constructor(conn, padPage, onPadPageRequested) {
 		this.conn = conn;
 		this.padPage = padPage;
+		this.onPadPageRequested = onPadPageRequested;
+
 		this.initName();
 		this.initColour(1);
 		this.initColour(2);
 		this.initStickSensitivity();
+		this.initShowPadButton();
 	}
 
 	initName() {
@@ -70,6 +73,13 @@ export default class SettingsPage {
 		slider.oninput = (ev) => {
 			const sensitivity = ev.target.value / 100;
 			this.sendEventSetSensitivity(sensitivity);
+		};
+	}
+
+	initShowPadButton() {
+		const showPadButton = document.getElementById('showPadButton');
+		showPadButton.onclick = (ev) => {
+			this.onPadPageRequested();
 		};
 	}
 
