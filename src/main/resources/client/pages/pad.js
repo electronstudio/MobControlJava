@@ -7,67 +7,83 @@ export default class PadPage {
 		this.conn = conn;
 		this.logger = logger;
 		this.onSettingsPageRequested = onSettingsPageRequested;
-		this.padIndex = null;
 
-		//
-		// Get HTML elements.
-		//
+		this.padIndex = null;
+		this.lastPayload = null;
+
 		this.canvasGuide = document.getElementById('canvasGuide');
 		this.sectionCanvas = document.getElementById('sectionCanvas');
 		this.graphicCanvas = document.getElementById('graphicCanvas');
 		this.overlayCanvas = document.getElementById('overlayCanvas');
 
-		this.initCanvasGraphics(1);
-		this.padState = new PadState(this.sectionCanvasImage, () => { this.onSettingsPageRequested(this.padIndex); });
-		this.initRedraw();
-		this.vibration = new Vibration(this.logger);
-		this.lastPayload = null;
-		this.initVibration();
+		this.initCanvasImages(1);
 		this.initPointerEvents();
+		this.padState = new PadState(this.sectionCanvasImage, () => { this.onSettingsPageRequested(this.padIndex); });
+
+		this.initRedrawOnResize();
+		this.initVibration();
 	}
 
-	initCanvasGraphics(padIndex) {
+	initCanvasImages(padIndex) {
 		if (this.padIndex === padIndex) {
 			return;
 		}
 
 		this.padIndex = padIndex;
 
-		//
-		// Load the images.
-		//
 		function getImage(imageSrc, onLoad) {
 			const image = new Image();
 			image.addEventListener('load', onLoad, false);
 			image.src = imageSrc;
 			return image;
 		}
+
 		this.logger.logAndNotify(`Loading layout ${padIndex}`);
 		const sectionImage = getImage(`./pads/${padIndex}/section.png`, () => {
 			this.redraw();
 			this.logger.logAndNotify(`Layout ${padIndex} loaded`);
 		});
+
 		this.logger.logAndNotify(`Loading graphic ${padIndex}`);
 		const graphicImage = getImage(`./pads/${padIndex}/graphic.svg`, () => {
 			this.redraw();
 			this.logger.logAndNotify(`Graphic ${padIndex} loaded`);
 		});
 
-
-		//
-		// Initialise utilities.
-		//
 		this.sectionCanvasImage = new CanvasImage(this.sectionCanvas, sectionImage);
 		this.graphicCanvasImage = new CanvasImage(this.graphicCanvas, graphicImage);
 		this.overlayCanvasImage = new CanvasImage(this.overlayCanvas, null);
 		this.canvasImages = [this.sectionCanvasImage, this.graphicCanvasImage, this.overlayCanvasImage];
 	}
 
-	//
-	// Redraw.
-	//
+	initPointerEvents() {
+		this.sectionCanvas.onpointerdown = (ev) => {
+			this.padState.onPointerDown(ev.pointerId, ev.clientX, ev.clientY);
+			this.redrawOverlay();
+			this.sendState();
+		};
+
+		this.sectionCanvas.onpointermove = (ev) => {
+			this.padState.onPointerMove(ev.pointerId, ev.clientX, ev.clientY);
+			this.redrawOverlay();
+			this.sendState();
+		};
+
+		this.sectionCanvas.onpointerup = (ev) => {
+			this.padState.onPointerUp(ev.pointerId);
+			this.redrawOverlay();
+			this.sendState();
+		};
+	}
+
 	redrawBase() {
-		this.canvasImages.forEach((canvasImage) => {
+		const canvasImages = [
+			this.sectionCanvasImage,
+			this.graphicCanvasImage,
+			this.overlayCanvasImage,
+		];
+
+		canvasImages.forEach((canvasImage) => {
 			canvasImage.alignWithElement(this.canvasGuide);
 			canvasImage.drawImage();
 		});
@@ -126,15 +142,24 @@ export default class PadPage {
 		this.redrawOverlay();
 	}
 
-	initRedraw() {
+	initRedrawOnResize() {
 		window.addEventListener('resize', () => {
 			this.redraw();
 		});
 	}
 
-	//
-	// State transmission.
-	//
+	initVibration() {
+		const vibration = new Vibration(this.logger);
+
+		const sub = (type, data) => {
+			switch (type) {
+			case 'vibrate': { vibration.run(data); break; }
+			default: { break; }
+			}
+		};
+
+		this.conn.addSub(sub);
+	}
 
 	sendState() {
 		const deltaState = this.padState.flushState();
@@ -143,48 +168,6 @@ export default class PadPage {
 			this.lastPayload = thisPayload;
 			this.conn.send(thisPayload);
 		}
-
-		if (deltaState.BUTTON_GUIDE) { this.vibration.testSimple(1234); }
-		if (deltaState.BUTTON_BACK) { this.vibration.testComplex(); }
-	}
-
-	//
-	// Receive messages.
-	//
-
-	initVibration() {
-		const sub = (type, data) => {
-			switch (type) {
-			case 'vibrate': { this.vibration.run(data); break; }
-			default: { break; }
-			}
-		};
-
-		this.conn.addSub(sub);
-	}
-
-	//
-	// React to user interaction.
-	//
-
-	initPointerEvents() {
-		this.sectionCanvas.onpointerdown = (ev) => {
-			this.padState.onPointerDown(ev.pointerId, ev.clientX, ev.clientY);
-			this.redrawOverlay();
-			this.sendState();
-		};
-
-		this.sectionCanvas.onpointermove = (ev) => {
-			this.padState.onPointerMove(ev.pointerId, ev.clientX, ev.clientY);
-			this.redrawOverlay();
-			this.sendState();
-		};
-
-		this.sectionCanvas.onpointerup = (ev) => {
-			this.padState.onPointerUp(ev.pointerId);
-			this.redrawOverlay();
-			this.sendState();
-		};
 	}
 
 	getPadState() {

@@ -36,7 +36,7 @@ function showPage(pageId) {
 }
 
 const onSettingsPageRequested = (padIndex) => {
-	padPage.initCanvasGraphics(padIndex);
+	padPage.initCanvasImages(padIndex);
 	showPage(pages.settings);
 };
 
@@ -44,7 +44,7 @@ const conn = new Conn(logger);
 const padPage = new PadPage(conn, logger, onSettingsPageRequested);
 
 const onPadPageRequested = (padIndex) => {
-	padPage.initCanvasGraphics(padIndex);
+	padPage.initCanvasImages(padIndex);
 	showPage(pages.pad);
 };
 
