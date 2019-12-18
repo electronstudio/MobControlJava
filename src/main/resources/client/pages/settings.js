@@ -21,34 +21,138 @@ const selectableColours = [
 	'#b2dcef',
 ];
 
+const defaultName = 'Player';
+const defaultColours = [null, '#ffffff', '#1b2632'];
+const defaultSensitivity = 0.6;
+const defaultLogVisibility = false;
+
 export default class SettingsPage {
 	constructor(conn, padPage, config, onPadPageRequested) {
+		// Store parameters.
 		this.conn = conn;
 		this.padPage = padPage;
 		this.config = config;
 		this.onPadPageRequested = onPadPageRequested;
 
-		this.initName();
-		this.initColour(1);
-		this.initColour(2);
-		this.initStickSensitivity();
-		this.initShowPadButton();
-		this.initShowLogCheckbox();
+		// Initialise Client.
+		this.initClientPadIndex();
+		this.initClientName();
+		this.initClientColour(1);
+		this.initClientColour(2);
+		this.initClientSensitivity();
+		this.initClientLogVisibility();
+
+		// Load client and server with config.
+		this.loadName();
+		this.loadColour(1);
+		this.loadColour(2);
+		this.loadSensitivity();
+		this.loadLogVisibility();
 	}
 
-	initName() {
-		const nameInput = document.getElementById('name');
-		nameInput.oninput = (ev) => {
-			const name = ev.target.value;
-			this.sendEventSetName(name);
+	//
+	// Pad index
+	//
+
+	setPadIndexOnClient(padIndex) {
+		this.onPadPageRequested(padIndex);
+	}
+
+	setPadIndex(padIndex) {
+		this.setPadIndexOnClient(padIndex);
+		this.config.setValue('PAD_INDEX', padIndex);
+	}
+
+	initClientPadIndex() {
+		this.showPadButton1 = document.getElementById('showPadButton1');
+		this.showPadButton2 = document.getElementById('showPadButton2');
+		this.showPadButton1.onclick = () => {
+			this.setPadIndex(1);
+		};
+
+		this.showPadButton2.onclick = () => {
+			this.setPadIndex(2);
 		};
 	}
 
-	initColour(index) {
-		const prefix = `colour${index}`;
-		const swatch = document.getElementById(`${prefix}Swatch`);
-		const selectButtons = document.getElementById(`${prefix}SelectButtons`);
+	//
+	// Name
+	//
 
+	setNameOnServer(name) {
+		const data = {
+			__type__: 'set_name',
+			name,
+		};
+		const json = JSON.stringify(data, null, 4);
+		try { this.conn.send(json); } catch (error) {}
+	}
+
+	setNameOnClient(name) {
+		this.nameInput.value = name;
+	}
+
+	setName(name) {
+		this.setNameOnClient(name);
+		this.setNameOnServer(name);
+		this.config.setValue('PLAYER_NAME', name);
+	}
+
+	loadName() {
+		const name = this.config.getValue('PLAYER_NAME', defaultName);
+		this.setName(name);
+	}
+
+	initClientName() {
+		this.nameInput = document.getElementById('name');
+		this.nameInput.oninput = (ev) => {
+			this.setName(ev.target.value);
+		};
+	}
+
+	//
+	// Colour
+	//
+
+	setColourOnServer(index, colour) {
+		const rgb = colour.match(/\d+/g);
+		const data = {
+			__type__: `set_colour_${index}`,
+			rgb,
+		};
+		const json = JSON.stringify(data, null, 4);
+		try { this.conn.send(json); } catch (error) {}
+	}
+
+	setColourOnClient(index, color) {
+		const swatch = this.swatchElements[index];
+		swatch.style['background-color'] = color;
+	}
+
+	setColour(index, color) {
+		this.setColourOnClient(index, color);
+		this.setColourOnServer(index, color);
+		this.config.setValue(`PLAYER_COL_${index}`, color);
+	}
+
+	loadColour(index) {
+		const color = this.config.getValue(`PLAYER_COL_${index}`, defaultColours[index]);
+		this.setColour(index, color);
+	}
+
+	initClientColour(index) {
+		this.swatchElements = [
+			'convert zero-indexing to one-indexing',
+			document.getElementById(`colour${1}Swatch`),
+			document.getElementById(`colour${2}Swatch`),
+		];
+		this.selectButtonContainers = [
+			'convert zero-indexing to one-indexing',
+			document.getElementById(`colour${1}SelectButtons`),
+			document.getElementById(`colour${2}SelectButtons`),
+		];
+
+		const selectButtons = this.selectButtonContainers[index];
 		selectButtons.innerHTML = ''; // Remove all example children.
 		selectableColours.forEach((selectableColour) => {
 			const child = document.createElement('div');
@@ -59,64 +163,65 @@ export default class SettingsPage {
 
 		selectButtons.childNodes.forEach((selectButton) => {
 			selectButton.onclick = () => {
-				const color = selectButton.style['background-color'];
-				swatch.style['background-color'] = color;
-				this.sendEventSetColour(index, color);
+				this.setColour(index, selectButton.style['background-color']);
 			};
 		});
 	}
 
-	initStickSensitivity() {
-		const slider = document.getElementById('stickSensitivity');
-		const padState = this.padPage.getPadState();
-		const initialSensitivity = padState.getAnalogStickSensitivity();
-		slider.value = initialSensitivity * 100;
+	//
+	// Sensitivity
+	//
 
-		slider.oninput = (ev) => {
-			const sensitivity = ev.target.value / 100;
-			this.sendEventSetSensitivity(sensitivity);
-		};
-	}
-
-	initShowPadButton() {
-		const showPadButton1 = document.getElementById('showPadButton1');
-		showPadButton1.onclick = (ev) => { this.onPadPageRequested(1); };
-
-		const showPadButton2 = document.getElementById('showPadButton2');
-		showPadButton2.onclick = (ev) => { this.onPadPageRequested(2); };
-	}
-
-	initShowLogCheckbox() {
-		const showLogCheckbox = document.getElementById('showLogCheckbox');
-		const logTextArea = document.getElementById('log');
-
-		showLogCheckbox.oninput = (ev) => {
-			const showLog = ev.target.checked;
-			logTextArea.hidden = !showLog;
-		};
-	}
-
-	sendEventSetName(name) {
-		const data = {
-			__type__: 'set_name',
-			name,
-		};
-		const json = JSON.stringify(data, null, 4);
-		this.conn.send(json);
-	}
-
-	sendEventSetColour(index, colour) {
-		const rgb = colour.match(/\d+/g);
-		const data = {
-			__type__: `set_colour_${index}`,
-			rgb,
-		};
-		const json = JSON.stringify(data, null, 4);
-		this.conn.send(json);
-	}
-
-	sendEventSetSensitivity(sensitivity) {
+	setSensitivityOnServer(sensitivity) {
 		const padState = this.padPage.getPadState();
 		padState.setAnalogStickSensitivity(sensitivity);
+	}
+
+	setSensitivityOnClient(sensitivity) {
+		this.sensitivitySlider.value = sensitivity * 100;
+	}
+
+	setSensitivity(sensitivity) {
+		this.setSensitivityOnClient(sensitivity);
+		this.setSensitivityOnServer(sensitivity);
+		this.config.setValue('ANALOG_STICK_SENSITIVITY', sensitivity);
+	}
+
+	loadSensitivity() {
+		const sensitivity = this.config.getValue('ANALOG_STICK_SENSITIVITY', defaultSensitivity);
+		this.setSensitivity(sensitivity);
+	}
+
+	initClientSensitivity() {
+		this.sensitivitySlider = document.getElementById('stickSensitivity');
+		this.sensitivitySlider.oninput = (ev) => {
+			this.setSensitivity(ev.target.value / 100);
+		};
+	}
+
+	//
+	// Log Visibility
+	//
+
+	setLogVisibilityOnClient(logVisibility) {
+		this.logTextArea.hidden = !logVisibility;
+	}
+
+	setLogVisibility(logVisibility) {
+		this.setLogVisibilityOnClient(logVisibility);
+		this.config.setValue('SHOW_LOG', logVisibility);
+	}
+
+	loadLogVisibility() {
+		const logVisibility = this.config.getValue('SHOW_LOG', defaultLogVisibility);
+		this.setLogVisibility(logVisibility);
+	}
+
+	initClientLogVisibility() {
+		this.logTextArea = document.getElementById('log');
+		this.showLogCheckbox = document.getElementById('showLogCheckbox');
+		this.showLogCheckbox.oninput = (ev) => {
+			this.setLogVisibility(ev.target.checked);
+		};
 	}
 }
