@@ -42,12 +42,18 @@ export default class SettingsPage {
 		this.initClientSensitivity();
 		this.initClientLogVisibility();
 
-		// Load client and server with config.
-		this.loadName();
-		this.loadColour(1);
-		this.loadColour(2);
-		this.loadSensitivity();
-		this.loadLogVisibility();
+		this.loaded = false;
+	}
+
+	loadConfig() {
+		if (!this.loaded) {
+			this.loadName();
+			this.loadColour(1);
+			this.loadColour(2);
+			this.loadSensitivity();
+			this.loadLogVisibility();
+			this.loaded = true;
+		}
 	}
 
 	//

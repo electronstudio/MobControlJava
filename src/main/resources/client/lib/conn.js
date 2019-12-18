@@ -1,7 +1,7 @@
 const SOCKET_TIMEOUT_MS = 10 * 1000;
 
 export default (function iife() {
-	function Conn(logger) {
+	function Conn(logger, onConnected) {
 		this.logger = logger;
 		this.url = new URL(window.location.origin);
 		this.url.protocol = 'ws';
@@ -9,6 +9,7 @@ export default (function iife() {
 		this.subs = [];
 		this.socketState = null;
 		this.socketStateLastModified = Date.now();
+		this.onConnected = onConnected;
 
 		this.setupSocket();
 
@@ -59,6 +60,7 @@ export default (function iife() {
 		this.socket.onopen = (event) => {
 			this.logger.log('Event: Socket opened');
 			this.logger.logAndNotify('Connected!');
+			this.onConnected();
 		};
 	};
 

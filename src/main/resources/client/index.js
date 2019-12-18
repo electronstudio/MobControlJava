@@ -41,7 +41,11 @@ const onSettingsPageRequested = (padIndex) => {
 	showPage(pages.settings);
 };
 
-const conn = new Conn(logger);
+function onConnected() {
+	settingsPage.loadConfig();
+}
+
+const conn = new Conn(logger, onConnected);
 const padPage = new PadPage(conn, logger, onSettingsPageRequested);
 
 const onPadPageRequested = (padIndex) => {
