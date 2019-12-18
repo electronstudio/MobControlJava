@@ -17,9 +17,18 @@ export default class Config {
 			const configString = localStorage.getItem(this.configKey);
 			const configObject = JSON.parse(configString);
 			return configObject;
-		} catch {
+		} catch (error) {
 			return {};
 		}
+	}
+
+	applyConfig(partialConfig) {
+		const config = {
+			...this.getConfig(),
+			...partialConfig,
+		};
+
+		return this.setConfig(config);
 	}
 
 	getValue(key, defaultValue = undefined) {
