@@ -9,13 +9,14 @@ import SettingsPage from './pages/settings.js';
 import PadPage from './pages/pad.js';
 import Conn from './lib/conn.js';
 import Logger from './lib/logger.js';
+import Config from './lib/config.js';
 
 const padPageElement = document.getElementById('padPage');
 const settingsPageElement = document.getElementById('setPage');
 const logElement = document.getElementById('log');
 const notificationElement = document.getElementById('notification');
 const logger = new Logger(logElement, notificationElement);
-
+const config = new Config();
 
 const pages = {
 	settings: 'settingsPage',
@@ -48,7 +49,7 @@ const onPadPageRequested = (padIndex) => {
 	showPage(pages.pad);
 };
 
-const settingsPage = new SettingsPage(conn, padPage, onPadPageRequested);
+const settingsPage = new SettingsPage(conn, padPage, config, onPadPageRequested);
 
 window.addEventListener('resize', (ev) => {
 	const portrait = window.matchMedia('(orientation: portrait)').matches;

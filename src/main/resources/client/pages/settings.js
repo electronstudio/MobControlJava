@@ -22,9 +22,10 @@ const selectableColours = [
 ];
 
 export default class SettingsPage {
-	constructor(conn, padPage, onPadPageRequested) {
+	constructor(conn, padPage, config, onPadPageRequested) {
 		this.conn = conn;
 		this.padPage = padPage;
+		this.config = config;
 		this.onPadPageRequested = onPadPageRequested;
 
 		this.initName();
