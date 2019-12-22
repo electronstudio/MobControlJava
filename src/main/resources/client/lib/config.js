@@ -32,7 +32,9 @@ export default class Config {
 	}
 
 	getValue(key, defaultValue = undefined) {
-		return this.getConfig()[key] || defaultValue;
+		const value = this.getConfig()[key];
+		if(value === undefined) return defaultValue;
+		else return value;
 	}
 
 	setValue(key, value) {

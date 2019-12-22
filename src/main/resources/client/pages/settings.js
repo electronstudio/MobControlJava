@@ -25,6 +25,7 @@ const defaultName = 'Player';
 const defaultColours = [null, '#ffffff', '#1b2632'];
 const defaultSensitivity = 0.6;
 const defaultLogVisibility = false;
+const defaultVibration = true;
 
 export default class SettingsPage {
 	constructor(conn, padPage, config, onPadPageRequested) {
@@ -41,6 +42,7 @@ export default class SettingsPage {
 		this.initClientColour(2);
 		this.initClientSensitivity();
 		this.initClientLogVisibility();
+		this.initClientVibration();
 
 		this.loaded = false;
 	}
@@ -52,6 +54,7 @@ export default class SettingsPage {
 			this.loadColour(2);
 			this.loadSensitivity();
 			this.loadLogVisibility();
+			this.loadVibration();
 			this.loaded = true;
 		}
 	}
@@ -185,16 +188,19 @@ export default class SettingsPage {
 
 	setSensitivityOnClient(sensitivity) {
 		this.sensitivitySlider.value = sensitivity * 100;
+		console.log("set sensitivity: "+sensitivity)
 	}
 
 	setSensitivity(sensitivity) {
 		this.setSensitivityOnClient(sensitivity);
 		this.setSensitivityOnServer(sensitivity);
 		this.config.setValue('ANALOG_STICK_SENSITIVITY', sensitivity);
+		console.log('ANALOG_STICK_SENSITIVITY', sensitivity);
 	}
 
 	loadSensitivity() {
 		const sensitivity = this.config.getValue('ANALOG_STICK_SENSITIVITY', defaultSensitivity);
+		console.log("load sensitivity: "+sensitivity)
 		this.setSensitivity(sensitivity);
 	}
 
@@ -221,6 +227,7 @@ export default class SettingsPage {
 	loadLogVisibility() {
 		const logVisibility = this.config.getValue('SHOW_LOG', defaultLogVisibility);
 		this.setLogVisibility(logVisibility);
+		this.showLogCheckbox.checked = logVisibility;
 	}
 
 	initClientLogVisibility() {
@@ -229,5 +236,25 @@ export default class SettingsPage {
 		this.showLogCheckbox.oninput = (ev) => {
 			this.setLogVisibility(ev.target.checked);
 		};
+	}
+
+	//
+	// Vibration
+	//
+
+	initClientVibration() {
+		this.vibrationCheckbox = document.getElementById('vibrationCheckbox');
+		this.vibrationCheckbox.oninput = (ev) => {
+			this.setVibration(ev.target.checked);
+		};
+	}
+
+	setVibration(vibration) {
+		this.config.setValue('VIBRATION', vibration);
+	}
+
+	loadVibration() {
+		const vibration = this.config.getValue('VIBRATION', defaultVibration);
+		this.vibrationCheckbox.checked = vibration;
 	}
 }

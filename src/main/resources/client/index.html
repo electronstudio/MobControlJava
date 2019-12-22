@@ -104,6 +104,10 @@
 			margin: 2px;
 			filter: drop-shadow(0 0 0.075rem black);
 		}
+
+		button {
+			font-size: 25;
+		}
 	</style>
 
 </head>
@@ -118,8 +122,8 @@
 			-->
 			<div id="setPage" class="follower bg-dark">
 				<div class="container" style="display: block;">
-					<button id="showPadButton1">Show Pad 1</button>
-					<button id="showPadButton2">Show Pad 2</button>
+					<button id="showPadButton1">Show Advanced Pad</button>
+					<button id="showPadButton2">Show Simple Pad</button>
 
 					<div class="col-md-8 order-md-1">
 						<div class="spacer"></div>
@@ -159,6 +163,13 @@
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" value="" id="showLogCheckbox">
 								<label class="form-check-label" for="showLogCheckbox">Show Log</label>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="" id="vibrationCheckbox">
+								<label class="form-check-label" for="vibrationCheckbox">Enable Vibration</label>
 							</div>
 						</div>
 					</div>

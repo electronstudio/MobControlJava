@@ -7,6 +7,7 @@
 export default (function iife() {
 	function Vibration(logger) {
 		this.logger = logger;
+		this.vibrationCheckbox = document.getElementById('vibrationCheckbox');
 
 		navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
 		if ('vibrate' in navigator) {
@@ -24,11 +25,13 @@ export default (function iife() {
 	};
 
 	Vibration.prototype.run = function run(data) {
-		const { mag_left, mag_right, duration_ms } = data;
-		const mag = (mag_left + mag_right) / 2;
-		const vibrationArray = this.getVibrationArray(mag, duration_ms);
-		const result = navigator.vibrate(vibrationArray);
-		this.logger.log('V2:', result, vibrationArray);
+		if(this.vibrationCheckbox.checked) {
+			const {mag_left, mag_right, duration_ms} = data;
+			const mag = (mag_left + mag_right) / 2;
+			const vibrationArray = this.getVibrationArray(mag, duration_ms);
+			const result = navigator.vibrate(vibrationArray);
+			this.logger.log('V2:', result, vibrationArray);
+		}
 	};
 
 	Vibration.prototype.testSimple = function testSimple(durationMs) {
